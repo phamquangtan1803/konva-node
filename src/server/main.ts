@@ -7,7 +7,7 @@ import data2 from "./data/data2.json";
 import { processData } from "./utils/processTemplate.js";
 
 const URL_ENDPOINTS = "https://stg-api.obello.com";
-const TEMPLATE_SIZE_ID = "3066b33128b44330a082dca9b48bd991";
+const TEMPLATE_SIZE_ID = "f63b0ecda7104e00a167530dd1eff5c5";
 
 const app = express();
 

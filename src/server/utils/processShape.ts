@@ -16,6 +16,7 @@ export const processShape = async (shapeData: Shape, groupData?: Group) => {
     shadowOpacity,
     shadowOffsetX,
     shadowOffsetY,
+    elementType,
     rotation,
     svgElement,
   } = shapeData;
@@ -29,6 +30,8 @@ export const processShape = async (shapeData: Shape, groupData?: Group) => {
   const applyFillColor = (node: any, fillColor: string) => {
     if (node.attributes) {
       node.attributes.fill = fillColor;
+      node.attributes.width = width;
+      node.attributes.height = height;
     }
     if (node.children) {
       node.children.forEach((child: any) => applyFillColor(child, fillColor));
@@ -36,7 +39,7 @@ export const processShape = async (shapeData: Shape, groupData?: Group) => {
   };
 
   applyFillColor(svgObject, shapeData.fill);
-
+  console.log(svgObject);
   // Convert back to SVG string
   const modifiedSvgText = stringify(svgObject);
   // Create a data URL from the modified SVG string
@@ -51,10 +54,11 @@ export const processShape = async (shapeData: Shape, groupData?: Group) => {
   const result = {
     attrs: {
       id,
-      width: svgElement.width,
-      height: svgElement.height,
-      scaleX: width / svgElement.width,
-      scaleY: height / svgElement.height,
+      width: width,
+      height: height,
+      // scaleX: width / svgElement.width,
+      // scaleY: height / svgElement.height,
+      elementType,
       x,
       y,
       opacity: opacity,

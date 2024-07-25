@@ -26,40 +26,69 @@ export const processImage = async (imageData: Image, groupData?: Group) => {
     cropWidth,
     cropX,
     cropY,
+    cornerRadiusBottomLeft,
+    cornerRadiusTopRight,
+    cornerRadiusTopLeft,
+    cornerRadiusBottomRight,
+    overlayFill,
+    alpha,
   } = imageData;
-  // const params = calcCropImageAttrs(imageData, {
-  //   cropX,
-  //   cropY,
-  //   cropWidth,
-  //   cropHeight,
-  //   rotation,
-  // });
-  // console.log("params", params);
-  // Your additional logic here (e.g., calculating position, returning node logo)
-  const result = {
+
+  const overlayNode = {
     attrs: {
-      id,
+      id: `overlay-${id}`,
       width,
       height,
       x,
       y,
-      opacity: opacity,
+      opacity: opacity * alpha,
       rotation,
-      shadowColor,
-      shadowBlur,
-      shadowOpacity,
-      shadowOffsetX,
-      shadowOffsetY,
-      strokeWidth,
-      stroke,
-      src,
-      // cropHeight: cropHeight,
-      // cropWidth: cropWidth,
-      // cropX: cropX,
-      // cropY: cropY,
-    },
+      fill: overlayFill,
 
-    className: "Image",
+      cornerRadius: [
+        cornerRadiusTopLeft,
+        cornerRadiusTopRight,
+        cornerRadiusBottomRight,
+        cornerRadiusBottomLeft,
+      ],
+    },
+    className: "Rect",
   };
+
+  const result = [
+    {
+      attrs: {
+        id,
+        width,
+        height,
+        x,
+        y,
+        opacity: opacity,
+        rotation,
+        shadowColor,
+        shadowBlur,
+        shadowOpacity,
+        shadowOffsetX,
+        shadowOffsetY,
+        strokeWidth,
+        stroke,
+        src,
+        cropHeight,
+        cropWidth,
+        cropX,
+        cropY,
+
+        cornerRadius: [
+          cornerRadiusTopLeft,
+          cornerRadiusTopRight,
+          cornerRadiusBottomRight,
+          cornerRadiusBottomLeft,
+        ],
+      },
+
+      className: "Image",
+    },
+    overlayNode,
+  ];
   return result;
 };

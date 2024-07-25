@@ -18,6 +18,7 @@ export const processLogo = async (logoData: Logo, groupData?: Group) => {
     shadowOffsetX,
     shadowOffsetY,
     rotation,
+    elementType,
   } = logoData;
   // Fetch the SVG data
   const response = await fetch(logoData.src);
@@ -51,6 +52,7 @@ export const processLogo = async (logoData: Logo, groupData?: Group) => {
   const result = {
     attrs: {
       id,
+      elementType,
       width: imageWidth,
       height: imageHeight,
       x,
@@ -66,5 +68,6 @@ export const processLogo = async (logoData: Logo, groupData?: Group) => {
     },
     className: "Image",
   };
-  return result;
+  console.log(result);
+  return [result];
 };

@@ -37,41 +37,26 @@ async function loadSVGStringNode(node, svgString) {
 
 export async function loadImageNode(node, url) {
   const image = await loadImage(url);
-
   const cropX = node.getAttr("cropX") || 0;
-  const x = node.getAttr("x") || 0;
-  const y = node.getAttr("y") || 0;
-
   const cropY = node.getAttr("cropY") || 0;
   const cropWidth = node.getAttr("cropWidth") || image.width;
   const cropHeight = node.getAttr("cropHeight") || image.height;
-  const rotation = node.getAttr("rotation") || 0;
 
-  const cropOptions = {
-    cropX,
-    cropY,
-    cropWidth,
-    cropHeight,
-    rotation,
-  };
-  const imageOptions = { width: image.width, height: image.height, x, y };
-
-  const params = calcCropImageAttrs(imageOptions, cropOptions);
-  console.log(params);
-  // node.setAttr("x", params.x || 0);
-  // node.setAttr("y", params.y || 0);
-  // node.setAttr("width", params.width || 0);
-  // node.setAttr("height", params.height || 0);
-
-  // // node.setAttr("cropWidth", params.cropWidth || 0);
-  // // node.setAttr("cropHeight", params.cropHeight || 0);
+  node.setAttr("cropHeight", image.height * cropHeight || 0);
+  node.setAttr("cropWidth", image.width * cropWidth || 0);
+  node.setAttr("cropY", image.height * cropY || 0);
+  node.setAttr("cropX", image.width * cropX || 0);
   // // node.setAttr("cropX", params.cropX || 0);
   // // node.setAttr("cropY", params.cropY || 0);
   // node.setAttr("rotation", params.rotation || 0);
 
   node.image(image);
 }
+export async function loadLogoNode(node, url) {
+  const image = await loadImage(url);
 
+  node.image(image);
+}
 async function loadTextNode(node) {
   const s3FilePath = node.attrs.s3FilePath;
   const fontFamily = `CustomFont-${node.attrs.id}`; // Unique font family based on the node id
@@ -86,6 +71,12 @@ export async function handleLoadData(stage) {
 
   nodes.forEach((node) => {
     if (node.className === "Image") {
+      if (
+        node.attrs.elementType === "logo" ||
+        node.attrs.elementType === "graphicShape"
+      )
+        console.log("im load from logo");
+      loadPromises.push(loadLogoNode(node, node.attrs.src));
       if (node.attrs.svgString) {
         loadPromises.push(loadSVGStringNode(node, node.attrs.svgString));
       } else if (node.attrs.src) {
