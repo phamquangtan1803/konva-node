@@ -31,6 +31,7 @@ export const processImage = async (imageData: Image, groupData?: Group) => {
     cornerRadiusTopLeft,
     cornerRadiusBottomRight,
     overlayFill,
+    elementType,
     alpha,
   } = imageData;
 
@@ -77,7 +78,7 @@ export const processImage = async (imageData: Image, groupData?: Group) => {
         cropWidth,
         cropX,
         cropY,
-
+        elementType,
         cornerRadius: [
           cornerRadiusTopLeft,
           cornerRadiusTopRight,
