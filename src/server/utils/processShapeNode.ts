@@ -42,32 +42,28 @@ export const processShapeNode = async (shapeData: Shape, groupData?: Group) => {
   const svgText = await response.text();
 
   // Parse the SVG
-  const svgObject = await parse(svgText);
 
+  const svgObject = await parse(svgText);
   // Modify the fill color
-  applyFillColor(svgObject, shapeData.fill);
+  if (svgObject.attributes) {
+    svgObject.attributes.fill = shapeData.fill;
+  }
+  if (svgObject.children) {
+    svgObject.children.forEach((child) =>
+      applyFillColor(child, shapeData.fill)
+    );
+  }
   const modifiedSvgText = stringify(svgObject);
   const modifiedSvgObject = await parse(modifiedSvgText);
-
   // Get path data
   const path = findPathDAttribute(modifiedSvgObject);
 
-  const overlayNode = new Konva.Path({
-    id: `overlay-${id}`,
-    width,
-    height,
-    scaleX,
-    scaleY,
-    x: 0, // Set relative to the group
-    y: 0, // Set relative to the group
-    opacity: alpha * opacity,
-    rotation,
-    fill: overlayFill,
-    stroke,
-    strokeWidth: shapeStrokeWidth,
-    data: pathDAttribute,
+  console.log("path", path);
+  const groupNode = new Konva.Group({
+    id: `group-${id}`,
+    x,
+    y,
   });
-
   const shapeNode = new Konva.Path({
     id,
     width,
@@ -89,12 +85,6 @@ export const processShapeNode = async (shapeData: Shape, groupData?: Group) => {
     data: path,
   });
 
-  const groupNode = new Konva.Group({
-    id: `group-${id}`,
-    x,
-    y,
-  });
-
   if (src) {
     const image = await loadImage(src);
     const scaleImageX = width / image?.width / cropWidth;
@@ -110,18 +100,33 @@ export const processShapeNode = async (shapeData: Shape, groupData?: Group) => {
   }
 
   groupNode.add(shapeNode);
-  groupNode.add(overlayNode);
-
+  if (overlayFill) {
+    const overlayNode = new Konva.Path({
+      id: `overlay-${id}`,
+      width,
+      height,
+      scaleX,
+      scaleY,
+      x: 0, // Set relative to the group
+      y: 0, // Set relative to the group
+      opacity: alpha * opacity,
+      rotation,
+      fill: overlayFill,
+      stroke,
+      strokeWidth: shapeStrokeWidth,
+      data: path,
+    });
+    groupNode.add(overlayNode);
+  }
   return groupNode;
 };
-const findPathDAttribute = (node) => {
-  let pathDAttribute = "";
-
-  if (node.name === "path" && node.attributes && node.attributes.d) {
-    pathDAttribute = node.attributes.d;
-  }
-  if (node.children) {
-    node.children.forEach((child) => findPathDAttribute(child));
-  }
+const findPathDAttribute = (svgObject: any) => {
+  let pathDAttribute: string[] = [];
+  svgObject.children.forEach((child) => {
+    console.log(child);
+    if (child.name === "path" && child.attributes && child.attributes.d) {
+      pathDAttribute += child.attributes.d;
+    }
+  });
   return pathDAttribute;
 };

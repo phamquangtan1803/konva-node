@@ -8,7 +8,7 @@ import { createStage } from "./utils/processTemplate.js";
 import imageData from "./data/image.json";
 import { processImageNode } from "./utils/processImageNode.js";
 const URL_ENDPOINTS = "https://stg-api.obello.com";
-const TEMPLATE_SIZE_ID = "f63b0ecda7104e00a167530dd1eff5c5";
+const TEMPLATE_SIZE_ID = "79be50db5b794300992dc27fbafabcbf";
 
 const app = express();
 
@@ -25,8 +25,7 @@ app.get("/canvas-image", async (req, res) => {
 
   const canvas = createCanvas(width, height);
   const context = canvas.getContext("2d");
-  const nodeData = await createStage(templateObelloData.data[0]);
-  const stage = Konva.Node.create(nodeData);
+  const stage = await createStage(templateObelloData.data[0]);
 
   // Load data and redraw the layer
 

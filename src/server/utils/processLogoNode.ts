@@ -51,7 +51,6 @@ export const processLogoNode = async (
   const modifiedSvgDataUrl = `data:image/svg+xml;base64,${Buffer.from(
     modifiedSvgText
   ).toString("base64")}`;
-
   const logoNode = new Konva.Image({
     id,
     width: logoWidth,
