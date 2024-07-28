@@ -7,6 +7,7 @@ export const processData = async (data: any) => {
   const promises = data.children.map((item: any) => processElement(item));
 
   const newChildren = await Promise.all(promises);
+  const flattenedChildren = flattenChildren(newChildren);
 
   const backgroundNode = {
     attrs: {
@@ -30,7 +31,7 @@ export const processData = async (data: any) => {
           fill: "#FFFFFF",
         },
         className: "Layer",
-        children: [backgroundNode, ...newChildren],
+        children: [backgroundNode, ...flattenedChildren],
       },
     ],
   };
@@ -58,4 +59,15 @@ const processElement = async (element: any) => {
       console.log("Unknown element type:", element.type);
       return null;
   }
+};
+const flattenChildren = (children: any[]): any[] => {
+  return children.reduce((acc, child) => {
+    if (Array.isArray(child)) {
+      return [...acc, ...flattenChildren(child)];
+    } else if (child && child.children) {
+      return [...acc, child, ...flattenChildren(child.children)];
+    } else {
+      return [...acc, child];
+    }
+  }, []);
 };

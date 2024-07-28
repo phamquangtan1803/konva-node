@@ -2,7 +2,7 @@ export interface Text {
   id: string;
   elementId: string;
   type: "text";
-  elementType: "body";
+  elementType: string;
   name: string;
   src: string;
   borderColor: string;
@@ -22,6 +22,7 @@ export interface Text {
   cropY: number;
   fontSize: number;
   visible: boolean;
+  backgroundColor: string;
   padding: {
     paddingRight: boolean;
     paddingLeft: boolean;

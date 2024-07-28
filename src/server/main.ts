@@ -27,6 +27,7 @@ app.get("/canvas-image", async (req, res) => {
   const nodeData = await processData(templateObelloData.data[0]);
   const stage = Konva.Node.create(nodeData);
   const layer = new Konva.Layer();
+
   stage.add(layer);
 
   // Load data and redraw the layer

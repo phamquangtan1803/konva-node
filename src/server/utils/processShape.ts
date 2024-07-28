@@ -16,8 +16,19 @@ export const processShape = async (shapeData: Shape, groupData?: Group) => {
     shadowOpacity,
     shadowOffsetX,
     shadowOffsetY,
+    elementType,
     rotation,
     svgElement,
+    stroke,
+    strokeWidth,
+    fill,
+    overlayFill,
+    alpha,
+    cropX,
+    cropY,
+    cropWidth,
+    cropHeight,
+    src,
   } = shapeData;
   // Fetch the SVG data
   const response = await fetch(svgElement.svgUrl);
@@ -36,37 +47,78 @@ export const processShape = async (shapeData: Shape, groupData?: Group) => {
   };
 
   applyFillColor(svgObject, shapeData.fill);
-
-  // Convert back to SVG string
   const modifiedSvgText = stringify(svgObject);
-  // Create a data URL from the modified SVG string
-  const modifiedSvgDataUrl = `data:image/svg+xml;base64,${Buffer.from(
-    modifiedSvgText
-  ).toString("base64")}`;
+  const modifiedSvgObject = await parse(modifiedSvgText);
 
-  // Load the modified SVG image
-  // const svgData = await loadImage(modifiedSvgDataUrl);
+  let pathDAttribute = "";
 
-  // Your additional logic here (e.g., calculating position, returning node logo)
-  const result = {
+  const findPathDAttribute = (node: any) => {
+    if (node.name === "path" && node.attributes && node.attributes.d) {
+      pathDAttribute = node.attributes.d;
+    }
+    if (node.children) {
+      node.children.forEach((child: any) => findPathDAttribute(child));
+    }
+  };
+
+  findPathDAttribute(modifiedSvgObject);
+  const scaleX = width / svgElement.width;
+  const scaleY = height / svgElement.height;
+  const shapeStrokeWidth = (strokeWidth * 10) / Math.max(scaleX, scaleY);
+
+  const overlayNode = {
     attrs: {
       id,
-      width: svgElement.width,
-      height: svgElement.height,
-      scaleX: width / svgElement.width,
-      scaleY: height / svgElement.height,
+      width: width,
+      height: height,
+      scaleX,
+      scaleY,
       x,
       y,
-      opacity: opacity,
+      opacity: alpha * opacity,
       rotation,
-      shadowColor,
-      shadowBlur,
-      shadowOpacity,
-      shadowOffsetX,
-      shadowOffsetY,
-      src: modifiedSvgDataUrl,
+
+      fill: overlayFill,
+      stroke,
+      strokeWidth: shapeStrokeWidth,
+      data: pathDAttribute,
     },
-    className: "Image",
+    className: "Path",
   };
+
+  const result = [
+    {
+      attrs: {
+        id,
+        width: width,
+        height: height,
+        scaleX,
+        scaleY,
+        elementType,
+        x,
+        y,
+        opacity: opacity,
+        rotation,
+        shadowColor,
+        shadowBlur: shadowBlur / Math.max(scaleX, scaleY),
+        shadowOpacity: shadowOpacity * opacity,
+        shadowOffsetX: shadowOffsetX / scaleX,
+        shadowOffsetY: shadowOffsetY / scaleY,
+        fill: fill,
+        stroke,
+        strokeWidth: (strokeWidth * 10) / Math.max(scaleX, scaleY),
+        fillPatternRepeat: "no-repeat",
+        cropX,
+        cropY,
+        cropWidth,
+        cropHeight,
+        src,
+        data: pathDAttribute,
+      },
+      className: "Path",
+    },
+    overlayNode,
+  ];
+  console.log(result);
   return result;
 };

@@ -38,32 +38,99 @@ async function loadSVGStringNode(node, svgString) {
 
 export async function loadImageNode(node, url) {
   const image = await loadImage(url);
+  const cropX = node.getAttr("cropX") || 0;
+  const cropY = node.getAttr("cropY") || 0;
+  const cropWidth = node.getAttr("cropWidth") || image.width;
+  const cropHeight = node.getAttr("cropHeight") || image.height;
 
- 
+  node.setAttr("cropHeight", image.height * cropHeight || 0);
+  node.setAttr("cropWidth", image.width * cropWidth || 0);
+  node.setAttr("cropY", image.height * cropY || 0);
+  node.setAttr("cropX", image.width * cropX || 0);
+
   node.image(image);
 }
+export async function loadFillPatternImageNode(node, url) {
+  const image = await loadImage(url);
 
+  const cropX = node.getAttr("cropX") || 0;
+  const cropY = node.getAttr("cropY") || 0;
+  const cropWidth = node.getAttr("cropWidth") || image.width;
+  const cropHeight = node.getAttr("cropHeight") || image.height;
+  const width = node.getAttr("width") || image.width;
+  const height = node.getAttr("height") || image.height;
+  const scaleX = node.getAttr("scaleX") || image.height;
+  const scaleY = node.getAttr("scaleY") || image.height;
+
+  // node.setAttr("cropHeight", image.height * cropHeight || 0);
+  // node.setAttr("cropWidth", image.width * cropWidth || 0);
+  // node.setAttr("cropY", image.height * cropY || 0);
+  // node.setAttr("cropX", image.width * cropX || 0);
+
+  const scaleImageX = width / image?.width / cropWidth;
+  const scaleImageY = height / image?.height / cropHeight;
+  const offsetImageX = image?.width * cropX;
+  const offsetImageY = image?.height * cropY;
+
+  node.fillPatternScaleX(scaleImageX / scaleX);
+  node.fillPatternScaleY(scaleImageY / scaleY);
+  node.fillPatternOffsetX(offsetImageX);
+  node.fillPatternOffsetY(offsetImageY);
+  node.fillPatternImage(image);
+  // node.setAttr("cropHeight", undefined);
+  // node.setAttr("cropWidth", undefined);
+  // node.setAttr("cropY", undefined);
+  // node.setAttr("cropX", undefined);
+  node.setAttr("fill", undefined);
+
+  console.log(node.attrs);
+}
+export async function loadLogoNode(node, url) {
+  const image = await loadImage(url);
+
+  node.image(image);
+}
 async function loadTextNode(node) {
+  console.log("node text", node)
   const s3FilePath = node.attrs.s3FilePath;
   const fontFamily = `CustomFont-${node.attrs.id}`; // Unique font family based on the node id
 
   await loadCustomFont(s3FilePath, fontFamily);
   node.fontFamily(fontFamily);
+
+}
+
+async function drawBackgroundNode(backgroundNode, textNode) {
+  console.log("background node", backgroundNode);
+  console.log("textNode", textNode)
 }
 
 export async function handleLoadData(stage) {
-  const nodes = stage.find("Image, Text");
+  const nodes = stage.find("Image, Text, Path, Shape");
   const loadPromises: Promise<any> = [];
+  nodes.forEach((node, index: number) => {
+    if (!node.attrs.elementType) return;
 
-  nodes.forEach((node) => {
     if (node.className === "Image") {
-      if (node.attrs.svgString) {
-        loadPromises.push(loadSVGStringNode(node, node.attrs.svgString));
-      } else if (node.attrs.src) {
+      if (node.attrs.elementType === "logo")
+        loadPromises.push(loadLogoNode(node, node.attrs.src));
+      else {
         loadPromises.push(loadImageNode(node, node.attrs.src));
       }
-    } else if (node.className === "Text" && node.attrs.s3FilePath) {
+    }
+
+    if (node.className === "Text" && node.attrs.s3FilePath) {
       loadPromises.push(loadTextNode(node));
+    }
+
+    if(node.className === "Shape" && node.attrs.elementType) {
+      loadPromises.push(drawBackgroundNode(node, nodes[index + 1]))
+    }
+
+
+    if (node.className === "Path") {
+      if (node.attrs.src != "")
+        loadPromises.push(loadFillPatternImageNode(node, node.attrs.src));
     }
   });
 

@@ -24,6 +24,7 @@ export const processLogo = async (logoData: Logo, groupData?: Group) => {
     scaleY,
     rotation,
     paddingRatio,
+    elementType,
   } = logoData;
   // Fetch the SVG data
 
@@ -81,8 +82,10 @@ export const processLogo = async (logoData: Logo, groupData?: Group) => {
       offsetX: -paddingX,
       offsetY: -paddingY,
       src: modifiedSvgDataUrl,
+      elementType,
     },
     className: "Image",
   };
-  return result;
+  console.log(result);
+  return [result];
 };

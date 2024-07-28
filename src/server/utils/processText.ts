@@ -7,6 +7,10 @@ export const processText = async (textData: Text, groupData?: Group) => {
     id,
     width,
     height,
+    cornerRadiusBottomLeft= 0,
+    cornerRadiusTopLeft= 0,
+    cornerRadiusBottomRight= 0,
+    cornerRadiusTopRight = 0,
     x,
     y,
     opacity,
@@ -24,13 +28,25 @@ export const processText = async (textData: Text, groupData?: Group) => {
     align,
     verticalAlign,
     s3FilePath,
+    fill,
+    elementType,
+    padding,
   } = textData;
   // Fetch the SVG data
+  const backgroundNode = {
+    attrs: {
+      fill: fill,
+      cornerRadius: [cornerRadiusTopLeft, cornerRadiusTopRight, cornerRadiusBottomLeft, cornerRadiusBottomRight],
+      padding
+    },
+    className: "Shape",
+  }
   const result = {
     attrs: {
       id,
       width: width,
       height: height,
+      backgroundColor: fill,
       x,
       y,
       opacity: opacity,
@@ -48,9 +64,12 @@ export const processText = async (textData: Text, groupData?: Group) => {
       align,
       s3FilePath,
       verticalAlign,
+      elementType
     },
     className: "Text",
   };
-  console.log(result);
-  return result;
+  return {
+    text: result,
+    background: backgroundNode,
+  };
 };

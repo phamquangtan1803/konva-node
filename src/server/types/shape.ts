@@ -22,6 +22,8 @@ export interface Shape {
   cropY: number;
   fontSize: number | null;
   visible: boolean;
+  overlayFill: string;
+  alpha: number;
   padding: {
     paddingRight: boolean;
     paddingLeft: boolean;
@@ -77,6 +79,7 @@ export interface Shape {
       strokeWidth: number;
     }>;
   };
+
   mute: boolean;
   autoFitEnabled: boolean;
   shadowEnabled: boolean;

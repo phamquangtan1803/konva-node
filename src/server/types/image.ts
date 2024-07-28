@@ -22,6 +22,7 @@ export interface Image {
   cropY: number;
   fontSize: number | null;
   visible: boolean;
+  alpha: number;
   padding: {
     paddingRight: boolean;
     paddingLeft: boolean;
@@ -49,6 +50,7 @@ export interface Image {
   cornerRadiusTopRight: number;
   cornerRadiusBottomLeft: number;
   cornerRadiusBottomRight: number;
+  overlayFill: string;
   fontFamily: string;
   s3FilePath: string;
   category: string;
