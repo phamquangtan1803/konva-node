@@ -94,6 +94,7 @@ export const processShapeNode = async (shapeData: Shape, groupData?: Group) => {
     x,
     y,
   });
+
   if (src) {
     const image = await loadImage(src);
     const scaleImageX = width / image?.width / cropWidth;

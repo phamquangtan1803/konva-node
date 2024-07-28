@@ -1,5 +1,4 @@
 import Konva from "konva";
-import { processShape } from "./processShape.js";
 import { processText } from "./processText.js";
 import { processImageNode } from "./processImageNode.js";
 import { processLogoNode } from "./processLogoTemplate.js";
