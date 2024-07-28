@@ -5,10 +5,8 @@ import { fetchJsonData } from "./helper.js";
 import data from "./data/data.json";
 import data2 from "./data/data2.json";
 import { createStage } from "./utils/processTemplate.js";
-import imageData from "./data/image.json";
-import { processImageNode } from "./utils/processImageNode.js";
 const URL_ENDPOINTS = "https://stg-api.obello.com";
-const TEMPLATE_SIZE_ID = "f63b0ecda7104e00a167530dd1eff5c5";
+const TEMPLATE_SIZE_ID = "36914d880a454e1ca585551a6937003b";
 
 const app = express();
 

@@ -18,7 +18,6 @@ export const processShapeNode = async (shapeData: Shape, groupData?: Group) => {
     shadowOpacity,
     shadowOffsetX,
     shadowOffsetY,
-    elementType,
     rotation,
     svgElement,
     stroke,

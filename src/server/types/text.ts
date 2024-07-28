@@ -22,6 +22,7 @@ export interface Text {
   cropY: number;
   fontSize: number;
   visible: boolean;
+  backgroundColor: string;
   padding: {
     paddingRight: boolean;
     paddingLeft: boolean;
