@@ -51,6 +51,5 @@ export const processText = async (textData: Text, groupData?: Group) => {
     },
     className: "Text",
   };
-  console.log(result);
   return result;
 };

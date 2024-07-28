@@ -5,7 +5,6 @@ import path, { isAbsolute } from "path";
 const fontsDir = path.join(__dirname, "fonts");
 import { __dirname } from "./pathUtil.mjs";
 import fs from "fs"; // Import fs to read the font file
-import { calcCropImageAttrs } from "./utils/calcAttribute.js";
 
 async function loadCustomFont(s3FilePath, fontFamily) {
   const uniqueFileName = `custom-font-${Date.now()}.otf`;
@@ -81,8 +80,6 @@ export async function loadFillPatternImageNode(node, url) {
   // node.setAttr("cropY", undefined);
   // node.setAttr("cropX", undefined);
   node.setAttr("fill", undefined);
-
-  console.log(node.attrs);
 }
 export async function loadLogoNode(node, url) {
   const image = await loadImage(url);

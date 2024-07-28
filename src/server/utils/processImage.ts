@@ -1,7 +1,6 @@
 import { Group } from "../types/group.js";
 import { parse, stringify } from "svgson";
 import { Image } from "../types/image.js";
-import { calcCropImageAttrs } from "./calcAttribute.js";
 
 export const processImage = async (imageData: Image, groupData?: Group) => {
   const {
