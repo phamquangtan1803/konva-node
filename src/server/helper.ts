@@ -28,18 +28,7 @@ async function loadCustomFont(s3FilePath: string, fontFamily: string) {
     throw error;
   }
 }
-async function loadSVGStringNode(node, svgString) {
-  const svgImage = await loadImage(
-    `data:image/svg+xml;base64,${Buffer.from(svgString).toString("base64")}`
-  );
-  node.image(svgImage);
-}
 
-export async function loadImageNode(node, url) {
-  const image = await loadImage(url);
-
-  node.image(image);
-}
 export async function loadFillPatternImageNode(node, url) {
   const image = await loadImage(url);
 
@@ -67,51 +56,9 @@ export async function loadFillPatternImageNode(node, url) {
   node.fillPatternOffsetX(offsetImageX);
   node.fillPatternOffsetY(offsetImageY);
   node.fillPatternImage(image);
-  // node.setAttr("cropHeight", undefined);
-  // node.setAttr("cropWidth", undefined);
-  // node.setAttr("cropY", undefined);
-  // node.setAttr("cropX", undefined);
   node.setAttr("fill", undefined);
 }
-export async function loadLogoNode(node, url) {
-  const image = await loadImage(url);
 
-  node.image(image);
-}
-async function loadTextNode(node) {
-  const s3FilePath = node.attrs.s3FilePath;
-  const fontFamily = `CustomFont-${node.attrs.id}`; // Unique font family based on the node id
-
-  await loadCustomFont(s3FilePath, fontFamily);
-  node.fontFamily(fontFamily);
-}
-
-export async function handleLoadData(stage) {
-  const nodes = stage.find("Image, Text, Path");
-  const loadPromises: Promise<any> = [];
-  nodes.forEach((node) => {
-    if (!node.attrs.elementType) return;
-
-    if (node.className === "Image") {
-      if (node.attrs.elementType === "logo")
-        loadPromises.push(loadLogoNode(node, node.attrs.src));
-      else {
-        loadPromises.push(loadImageNode(node, node.attrs.src));
-      }
-    }
-
-    if (node.className === "Text" && node.attrs.s3FilePath) {
-      loadPromises.push(loadTextNode(node));
-    }
-
-    if (node.className === "Path") {
-      if (node.attrs.src != "")
-        loadPromises.push(loadFillPatternImageNode(node, node.attrs.src));
-    }
-  });
-
-  await Promise.all(loadPromises);
-}
 export async function fetchJsonData(apiUrl: string) {
   try {
     const response = await axios.get(apiUrl);
@@ -183,4 +130,12 @@ export const calculateLogoSize = (logoData: Logo) => {
     paddingX: Math.round(imagePaddingLeft),
     paddingY: Math.round(imagePaddingTop),
   };
+};
+export const applyFillColor = (node, fillColor) => {
+  if (node.attributes) {
+    node.attributes.fill = fillColor;
+  }
+  if (node.children) {
+    node.children.forEach((child) => applyFillColor(child, fillColor));
+  }
 };

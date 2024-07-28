@@ -1,9 +1,9 @@
 import Konva from "konva";
-import { processImage } from "./processImage.js";
-import { processLogo } from "./processLogo.js";
 import { processShape } from "./processShape.js";
 import { processText } from "./processText.js";
 import { processImageNode } from "./processImageNode.js";
+import { processLogoNode } from "./processLogoTemplate.js";
+import { processShapeNode } from "./processShapeNode.js";
 
 export const createStage = async (data: any) => {
   const backgroundNode = new Konva.Rect({
@@ -40,13 +40,13 @@ export const createStage = async (data: any) => {
 const processElement = async (element: any) => {
   switch (element.type) {
     case "svg":
-      return processLogo(element);
+      return processLogoNode(element);
     case "text":
       return processText(element);
     case "image":
       return processImageNode(element);
     case "shape":
-      return processShape(element);
+      return processShapeNode(element);
     default:
       console.log("Unknown element type:", element.type);
       return null;

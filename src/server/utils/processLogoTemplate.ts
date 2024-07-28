@@ -3,8 +3,9 @@ import { Group } from "../types/group.js";
 import { Logo } from "../types/logo.js";
 import { parse, stringify } from "svgson";
 import Konva from "konva";
+import { applyFillColor, calculateLogoSize } from "../helper.js";
 
-export const processLogo = async (
+export const processLogoNode = async (
   logoData: Logo,
   groupData?: Group
 ): Promise<Konva.Image> => {
@@ -12,6 +13,7 @@ export const processLogo = async (
     id,
     imageWidth,
     imageHeight,
+    visible,
     x,
     y,
     opacity,
@@ -20,10 +22,17 @@ export const processLogo = async (
     shadowOpacity,
     shadowOffsetX,
     shadowOffsetY,
+    scaleX,
+    scaleY,
     rotation,
-    elementType,
+    paddingRatio,
   } = logoData;
-
+  const {
+    paddingX,
+    paddingY,
+    width: logoWidth,
+    height: logoHeight,
+  } = calculateLogoSize(logoData);
   // Fetch the SVG data
   const response = await fetch(logoData.src);
   const svgText = await response.text();
@@ -32,14 +41,6 @@ export const processLogo = async (
   const svgObject = await parse(svgText);
 
   // Modify the fill color
-  const applyFillColor = (node: any, fillColor: string) => {
-    if (node.attributes) {
-      node.attributes.fill = fillColor;
-    }
-    if (node.children) {
-      node.children.forEach((child: any) => applyFillColor(child, fillColor));
-    }
-  };
 
   applyFillColor(svgObject, logoData.fill);
 
@@ -51,23 +52,31 @@ export const processLogo = async (
     modifiedSvgText
   ).toString("base64")}`;
 
-  // Load the modified SVG image
-  const image = await loadImage(modifiedSvgDataUrl);
-
-  // Create and return a Konva.Image node
-  return new Konva.Image({
+  const logoNode = new Konva.Image({
     id,
-    image: image,
-    width: imageWidth,
-    height: imageHeight,
+    width: logoWidth,
+    height: logoHeight,
     x,
     y,
-    opacity,
+    opacity: opacity,
+    paddingRatio,
     rotation,
     shadowColor,
     shadowBlur,
     shadowOpacity,
     shadowOffsetX,
     shadowOffsetY,
+    cropWidth: imageWidth,
+    cropHeight: imageHeight,
+    visible,
+    scaleX,
+    scaleY,
+    offsetX: -paddingX,
+    offsetY: -paddingY,
   });
+  // Load the modified SVG image
+  const image = await loadImage(modifiedSvgDataUrl);
+  logoNode.image(image);
+  // Create and return a Konva.Image node
+  return logoNode;
 };

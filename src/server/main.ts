@@ -1,7 +1,7 @@
 import express from "express";
 import { createCanvas, loadImage, registerFont } from "canvas";
 import Konva from "konva";
-import { fetchJsonData, handleLoadData, loadImageNode } from "./helper.js";
+import { fetchJsonData } from "./helper.js";
 import data from "./data/data.json";
 import data2 from "./data/data2.json";
 import { createStage } from "./utils/processTemplate.js";
@@ -29,7 +29,6 @@ app.get("/canvas-image", async (req, res) => {
   const stage = Konva.Node.create(nodeData);
 
   // Load data and redraw the layer
-  await handleLoadData(stage);
 
   // Create a Konva Node from the JSON and add it to the stage
   const konvaCanvas = stage.toCanvas();
