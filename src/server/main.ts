@@ -1,11 +1,10 @@
 import express from "express";
 import { createCanvas, loadImage, registerFont } from "canvas";
 import Konva from "konva";
-import { fetchJsonData, handleLoadData, loadImageNode } from "./helper.js";
+import { fetchJsonData } from "./helper.js";
 import data from "./data/data.json";
 import data2 from "./data/data2.json";
-import { processData } from "./utils/processTemplate.js";
-
+import { createStage } from "./utils/processTemplate.js";
 const URL_ENDPOINTS = "https://stg-api.obello.com";
 const TEMPLATE_SIZE_ID = "36914d880a454e1ca585551a6937003b";
 
@@ -24,16 +23,10 @@ app.get("/canvas-image", async (req, res) => {
 
   const canvas = createCanvas(width, height);
   const context = canvas.getContext("2d");
-  const nodeData = await processData(templateObelloData.data[0]);
+  const nodeData = await createStage(templateObelloData.data[0]);
   const stage = Konva.Node.create(nodeData);
-  const layer = new Konva.Layer();
-
-  stage.add(layer);
 
   // Load data and redraw the layer
-  await handleLoadData(stage);
-
-  layer.batchDraw();
 
   // Create a Konva Node from the JSON and add it to the stage
   const konvaCanvas = stage.toCanvas();

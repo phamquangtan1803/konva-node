@@ -1,73 +1,53 @@
-import { processImage } from "./processImage.js";
-import { processLogo } from "./processLogo.js";
-import { processShape } from "./processShape.js";
+import Konva from "konva";
 import { processText } from "./processText.js";
+import { processImageNode } from "./processImageNode.js";
+import { processLogoNode } from "./processLogoNode.js";
+import { processShapeNode } from "./processShapeNode.js";
 
-export const processData = async (data: any) => {
-  const promises = data.children.map((item: any) => processElement(item));
+export const createStage = async (data: any) => {
+  const backgroundNode = new Konva.Rect({
+    x: 0,
+    y: 0,
+    width: data.width,
+    height: data.height,
+    fill: data.background,
+  });
 
-  const newChildren = await Promise.all(promises);
-  const flattenedChildren = flattenChildren(newChildren);
+  const stage = new Konva.Stage({
+    width: data.width,
+    height: data.height,
+  });
 
-  const backgroundNode = {
-    attrs: {
-      x: 0,
-      y: 0,
-      width: data.width,
-      height: data.height,
-      fill: data.background,
-    },
-    className: "Rect",
-  };
-  const stage = {
-    attrs: {
-      width: data.width,
-      height: data.height,
-    },
-    className: "Stage",
-    children: [
-      {
-        attrs: {
-          fill: "#FFFFFF",
-        },
-        className: "Layer",
-        children: [backgroundNode, ...flattenedChildren],
-      },
-    ],
-  };
-  console.log(stage.children[0].children);
+  const layer = new Konva.Layer();
+
+  layer.add(backgroundNode);
+
+  // Add element to layer
+  for (const element of data.children) {
+    const node = await processElement(element);
+    if (node) {
+      layer.add(node);
+    }
+  }
+  layer.batchDraw();
+
+  stage.add(layer);
+
   return stage;
 };
 
 const processElement = async (element: any) => {
   switch (element.type) {
     case "svg":
-      return processLogo(element);
-    // Uncomment and add cases as needed
+      return processLogoNode(element);
     case "text":
       return processText(element);
     case "image":
-      return processImage(element);
+      return processImageNode(element);
     case "shape":
-      return processShape(element);
-    // case "graphicShape":
-    //   return processShape(element);
-    // case "cta":
-    //   return processCta(element);
-    // Add cases for other element types as needed
+      return processShapeNode(element);
     default:
       console.log("Unknown element type:", element.type);
       return null;
   }
-};
-const flattenChildren = (children: any[]): any[] => {
-  return children.reduce((acc, child) => {
-    if (Array.isArray(child)) {
-      return [...acc, ...flattenChildren(child)];
-    } else if (child && child.children) {
-      return [...acc, child, ...flattenChildren(child.children)];
-    } else {
-      return [...acc, child];
-    }
-  }, []);
 };
