@@ -8,7 +8,7 @@ import { createStage } from "./utils/processTemplate.js";
 import imageData from "./data/image.json";
 import { processImageNode } from "./utils/processImageNode.js";
 const URL_ENDPOINTS = "https://stg-api.obello.com";
-const TEMPLATE_SIZE_ID = "79be50db5b794300992dc27fbafabcbf";
+const TEMPLATE_SIZE_ID = "f63b0ecda7104e00a167530dd1eff5c5";
 
 const app = express();
 

@@ -22,6 +22,7 @@ export const processLineNode = (shapeData: Line, groupData?: Group) => {
     overlayFill,
     alpha,
     points,
+    dash,
   } = shapeData;
 
   const groupNode = new Konva.Group({
@@ -42,6 +43,7 @@ export const processLineNode = (shapeData: Line, groupData?: Group) => {
     shadowOpacity,
     shadowOffsetX,
     shadowOffsetY,
+    dash,
   });
   groupNode.add(lineNode);
 
@@ -58,6 +60,7 @@ export const processLineNode = (shapeData: Line, groupData?: Group) => {
       shadowOpacity,
       shadowOffsetX,
       shadowOffsetY,
+      dash,
     });
     groupNode.add(overlayNode);
   }

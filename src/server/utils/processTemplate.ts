@@ -46,7 +46,11 @@ const processElement = async (element: any) => {
     case "image":
       return processImageNode(element);
     case "shape":
-      if (element.elementType === "line") return processLineNode(element);
+      if (
+        element.elementType === "line" ||
+        element.elementType === "line_outline"
+      )
+        return processLineNode(element);
       return processShapeNode(element);
     default:
       console.log("Unknown element type:", element.type);

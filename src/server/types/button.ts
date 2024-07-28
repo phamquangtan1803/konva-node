@@ -1,4 +1,4 @@
-export interface Line {
+export interface Button {
   id: string;
   elementId?: string;
   type: string;
@@ -6,7 +6,7 @@ export interface Line {
   name?: string;
   src?: string;
   borderColor?: string;
-  text?: string;
+  text: string;
   width: number;
   height: number;
   groupId?: string | null;
@@ -20,7 +20,7 @@ export interface Line {
   cropHeight: number;
   cropX: number;
   cropY: number;
-  fontSize?: number | null;
+  fontSize: number;
   visible: boolean;
   padding: {
     paddingRight: boolean;
@@ -30,7 +30,6 @@ export interface Line {
     horizontal: number;
     vertical: number;
   };
-  dash: number[];
   fill: string;
   align: string;
   verticalAlign: string;
@@ -41,18 +40,16 @@ export interface Line {
   textDecoration?: string;
   stroke: string;
   strokeWidth: number;
-  points: number[];
-  cornerRadius?: number | null;
+  cornerRadius: number;
   cornerRadiusTopLeft: number;
   cornerRadiusTopRight: number;
   cornerRadiusBottomLeft: number;
   cornerRadiusBottomRight: number;
+  textFill: string;
   fontFamily: string;
   s3FilePath?: string;
   category?: string;
   paddingRatio: number;
-  alpha: number;
-  overlayFill: string;
   listening: boolean;
   index: number;
   scaleX: number;
@@ -60,8 +57,6 @@ export interface Line {
   fillPatternScaleX: number;
   fillPatternScaleY: number;
   svgElement?: any;
-  imageWidth?: number | null;
-  imageHeight?: number | null;
   mute: boolean;
   autoFitEnabled: boolean;
   shadowEnabled: boolean;
