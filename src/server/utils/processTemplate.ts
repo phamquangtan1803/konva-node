@@ -4,6 +4,9 @@ import { processImageNode } from "./processImageNode.js";
 import { processLogoNode } from "./processLogoNode.js";
 import { processShapeNode } from "./processShapeNode.js";
 import { processLineNode } from "./processLineNode.js";
+import { processButtonNode } from "./processButtonNode.js";
+import { processStarRatingNode } from "./processStarRating.js";
+import { processTextNode } from "./processTextNode.js";
 
 export const createStage = async (data: any) => {
   const backgroundNode = new Konva.Rect({
@@ -51,7 +54,14 @@ const processElement = async (element: any) => {
         element.elementType === "line_outline"
       )
         return processLineNode(element);
+      if (element.elementType === "button") return processButtonNode(element);
+      if (element.elementType === "star_rating")
+        return processStarRatingNode(element);
+
       return processShapeNode(element);
+
+    case "image":
+      return processImageNode(element);
     default:
       console.log("Unknown element type:", element.type);
       return null;

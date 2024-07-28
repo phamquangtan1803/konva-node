@@ -52,7 +52,7 @@ export async function loadLogoNode(node, url) {
 
 async function drawBackgroundNode(backgroundNode, textNode) {
   console.log("background node", backgroundNode);
-  console.log("textNode", textNode)
+  console.log("textNode", textNode);
 }
 
 export async function handleLoadData(stage) {
@@ -73,10 +73,9 @@ export async function handleLoadData(stage) {
       loadPromises.push(loadTextNode(node));
     }
 
-    if(node.className === "Shape" && node.attrs.elementType) {
-      loadPromises.push(drawBackgroundNode(node, nodes[index + 1]))
+    if (node.className === "Shape" && node.attrs.elementType) {
+      loadPromises.push(drawBackgroundNode(node, nodes[index + 1]));
     }
-
 
     if (node.className === "Path") {
       if (node.attrs.src != "")
@@ -188,10 +187,8 @@ const drawBorderLine = ({ lines, shape, ctx, textElement, options }) => {
   const shapeHeight = textElement?.height() + gapY * 2;
 
   const isAlignCenter = textElement?.align() === "center";
-  const isVerticalAlignMiddle =
-    textElement?.verticalAlign() === "middle";
-  const isVerticalAlignBottom =
-    textElement?.verticalAlign() === "bottom";
+  const isVerticalAlignMiddle = textElement?.verticalAlign() === "middle";
+  const isVerticalAlignBottom = textElement?.verticalAlign() === "bottom";
 
   const paddingVertical = isVerticalAlignMiddle
     ? (shapeHeight - gapY * 2 - lineHeight * lines.length) / 2
@@ -416,7 +413,7 @@ export const drawTextBackground = ({ ctx, shape, textElement, options }) => {
     ctx.fillStrokeShape(shape);
     return;
   }
-  if(isTextOneLine) {
+  if (isTextOneLine) {
     const rectRadius = Math.min(maxLineHeight / 2, maxLineWidth / 2, radius);
     ctx.roundRect(x, y, maxLineWidth, maxLineHeight, rectRadius);
 

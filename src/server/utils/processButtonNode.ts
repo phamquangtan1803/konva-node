@@ -6,11 +6,13 @@ import { Shape } from "../types/shape.js";
 import { applyFillColor } from "../helper.js";
 import { Button } from "../types/button.js";
 
-export const processShapeNode = async (
+export const processButtonNode = async (
   buttonData: Button,
   groupData?: Group
 ) => {
   const {
+    scaleX,
+    scaleY,
     id,
     x,
     y,
@@ -30,11 +32,19 @@ export const processShapeNode = async (
     fill,
     overlayFill,
     alpha,
+    textFill,
+    text,
+    fontFamily,
+    fontSize,
     cropX,
     cropY,
     cropWidth,
     cropHeight,
     src,
+    cornerRadiusTopLeft,
+    cornerRadiusTopRight,
+    cornerRadiusBottomRight,
+    cornerRadiusBottomLeft,
   } = buttonData;
 
   // Get path data
@@ -43,59 +53,109 @@ export const processShapeNode = async (
     id: `group-${id}`,
     x,
     y,
+    rotation,
   });
-  const shapeNode = new Konva.Path({
+  const buttonRectNode = new Konva.Image({
     id,
     width,
     height,
-    scaleX,
-    scaleY,
     x: 0, // Set relative to the group
     y: 0, // Set relative to the group
     opacity,
     rotation,
     shadowColor,
-    shadowBlur: shadowBlur / Math.max(scaleX, scaleY),
-    shadowOpacity: shadowOpacity * opacity,
-    shadowOffsetX: shadowOffsetX / scaleX,
-    shadowOffsetY: shadowOffsetY / scaleY,
+    shadowBlur,
+    shadowOpacity,
+    shadowOffsetX,
+    shadowOffsetY,
     fill,
+    strokeWidth,
     stroke,
-    strokeWidth: shapeStrokeWidth,
+    crop: {
+      x: cropX,
+      y: cropY,
+      width: cropWidth,
+      height: cropHeight,
+    },
+    cornerRadius: [
+      cornerRadiusTopLeft,
+      cornerRadiusTopRight,
+      cornerRadiusBottomRight,
+      cornerRadiusBottomLeft,
+    ],
   });
-
   if (src) {
     const image = await loadImage(src);
     const scaleImageX = width / image?.width / cropWidth;
     const scaleImageY = height / image?.height / cropHeight;
     const offsetImageX = image?.width * cropX;
     const offsetImageY = image?.height * cropY;
-    shapeNode.fillPatternScaleX(scaleImageX / scaleX);
-    shapeNode.fillPatternScaleY(scaleImageY / scaleY);
-    shapeNode.fillPatternOffsetX(offsetImageX);
-    shapeNode.fillPatternOffsetY(offsetImageY);
-    shapeNode.fillPatternImage(image);
-    shapeNode.setAttr("fill", undefined);
+    buttonRectNode.fillPatternScaleX(scaleImageX / scaleY);
+    buttonRectNode.fillPatternScaleY(scaleImageY / scaleY);
+    buttonRectNode.fillPatternOffsetX(offsetImageX);
+    buttonRectNode.fillPatternOffsetY(offsetImageY);
+    buttonRectNode.fillPatternImage(image);
+    buttonRectNode.setAttr("fill", undefined);
   }
 
-  groupNode.add(shapeNode);
+  groupNode.add(buttonRectNode);
+
   if (overlayFill) {
-    const overlayNode = new Konva.Path({
+    const overlayNode = new Konva.Rect({
       id: `overlay-${id}`,
       width,
       height,
-      scaleX,
-      scaleY,
       x: 0, // Set relative to the group
       y: 0, // Set relative to the group
       opacity: alpha * opacity,
       rotation,
+
       fill: overlayFill,
-      stroke,
-      strokeWidth: shapeStrokeWidth,
-      data: path,
+      strokeWidth,
+      crop: {
+        x: cropX,
+        y: cropY,
+        width: cropWidth,
+        height: cropHeight,
+      },
+      cornerRadius: [
+        cornerRadiusTopLeft,
+        cornerRadiusTopRight,
+        cornerRadiusBottomRight,
+        cornerRadiusBottomLeft,
+      ],
     });
     groupNode.add(overlayNode);
   }
+  const buttonTextNode = new Konva.Text({
+    id: `text-${id}`,
+    width,
+    height,
+    x: 0, // Set relative to the group
+    y: 0, // Set relative to the group
+    opacity: opacity,
+    rotation,
+    text,
+    fontFamily,
+    fontSize,
+    fill: textFill,
+    strokeWidth,
+    align: "center",
+    verticalAlign: "middle",
+    crop: {
+      x: cropX,
+      y: cropY,
+      width: cropWidth,
+      height: cropHeight,
+    },
+    cornerRadius: [
+      cornerRadiusTopLeft,
+      cornerRadiusTopRight,
+      cornerRadiusBottomRight,
+      cornerRadiusBottomLeft,
+    ],
+  });
+  groupNode.add(buttonTextNode);
+
   return groupNode;
 };
