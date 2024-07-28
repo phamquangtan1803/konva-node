@@ -35,6 +35,7 @@ export const processText = async (textData: Text, groupData?: Group) => {
     scaleX,
     scaleY,
     visible,
+    textTransform,
   } = textData;
 
   const isEnableBackground = fill && fill !== "" && fill !== "transparent";
@@ -68,7 +69,7 @@ export const processText = async (textData: Text, groupData?: Group) => {
     verticalAlign,
     s3FilePath,
     fill: textFill,
-    // padding,
+    textTransform,
     ellipsis: !autoFitEnabled,
     scaleX,
     scaleY,
@@ -90,6 +91,7 @@ export const processText = async (textData: Text, groupData?: Group) => {
     y: 0,
     stroke: fill,
     fill: fill,
+    opacity: opacity,
     width: width,
     height: height,
     ...(isEnableBackground && {
