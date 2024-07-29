@@ -1,5 +1,6 @@
 import axios from "axios";
 import { Logo } from "./types/logo.js";
+// import WebFont from "webfontloader";
 
 export const TEXT_ALIGNMENTS = {
   LEFT: "left",
@@ -9,6 +10,13 @@ export const TEXT_ALIGNMENTS = {
   TOP: "top",
   BOTTOM: "bottom",
   MIDDLE: "middle",
+};
+
+export const TEXT_TRANSFORM: any = {
+  SENTENCE_CASE: "sentenceCase",
+  UPPERCASE: "uppercase",
+  TITLE_CASE: "titleCase",
+  AS_TYPED: "none",
 };
 
 export async function fetchJsonData(apiUrl: string) {
@@ -449,4 +457,34 @@ export const joinGroupElement = (elementList: any[]) => {
     .filter((element) => element.type != "group");
   newElementList.push(...groupList);
   return newElementList;
+};
+
+export const convertFontFamily = (fontFamily = "", fontId = "") => {
+  const font = fontFamily.replace(/[^a-zA-Z0-9]/g, "_");
+  return `${font}${fontId ? "_" : ""}${fontId}`;
+};
+
+export const convertTextToStyle = (paragraph = "", style = "") => {
+  switch (style) {
+    case TEXT_TRANSFORM.SENTENCE_CASE:
+      return paragraph
+        .toLowerCase()
+        ?.split(". ")
+        .map((sentence) => {
+          return sentence.charAt(0).toUpperCase() + sentence.slice(1);
+        })
+        .join(". ");
+    case TEXT_TRANSFORM.TITLE_CASE:
+      return paragraph
+        .toLowerCase()
+        ?.split(" ")
+        .map((word) => {
+          return word.charAt(0).toUpperCase() + word.slice(1);
+        })
+        .join(" ");
+    case TEXT_TRANSFORM.UPPERCASE:
+      return paragraph.toUpperCase();
+    default:
+      return paragraph;
+  }
 };
