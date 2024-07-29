@@ -1,7 +1,15 @@
 import Konva from "konva";
+import axios from 'axios'
 import { Group } from "../types/group.js";
 import { Text } from "../types/text.js";
-import { drawTextBackground } from "../helper.js";
+import { drawTextBackground, convertTextToStyle, convertFontFamily } from "../helper.js";
+import { registerFont } from "canvas";
+import path from "path";
+import fs from "fs";
+import {__dirname} from '../pathUtil.js'
+
+// Get the directory name of the current module
+ const fontsDir = path.join(__dirname, 'fonts');
 
 export const processText = async (textData: Text, groupData?: Group) => {
   const {
@@ -36,9 +44,33 @@ export const processText = async (textData: Text, groupData?: Group) => {
     scaleY,
     visible,
     textTransform,
+    fontFamily, 
+    fontStyle,
+    textDecoration,
+    fontId,
   } = textData;
 
-  const isEnableBackground = fill && fill !== "" && fill !== "transparent";
+  const loadCustomFont = async (s3FilePath: string, fontFamily: string) => {
+    const uniqueFileName = `custom-font-${Date.now()}.otf`;
+    const fontPath = path.join(fontsDir, uniqueFileName);
+  
+    if (!s3FilePath) {
+      throw new Error("There is no file path");
+    }
+  
+    try {
+      const response = await axios.get(s3FilePath, {
+        responseType: "arraybuffer",
+      });
+      const buffer = Buffer.from(response.data);
+      fs.writeFileSync(fontPath, buffer);
+  
+      registerFont(fontPath, { family: fontFamily });
+    } catch (error) {
+      console.error("Error loading font:", error);
+      throw error;
+    }
+  }
 
   const groupNode = new Konva.Group({
     id: `group-${id}`,
@@ -51,6 +83,7 @@ export const processText = async (textData: Text, groupData?: Group) => {
   });
 
   const textNode = new Konva.Text({
+    id: id,
     x: 0,
     y: 0,
     width: width,
@@ -61,9 +94,11 @@ export const processText = async (textData: Text, groupData?: Group) => {
     shadowOpacity,
     shadowOffsetX,
     shadowOffsetY,
-    text,
+    text: convertTextToStyle(text, textTransform),
     lineHeight,
     letterSpacing,
+    fontStyle: `${fontStyle}`,
+    textDecoration,
     fontSize,
     align,
     verticalAlign,
@@ -75,6 +110,9 @@ export const processText = async (textData: Text, groupData?: Group) => {
     scaleY,
     visible,
   });
+
+  await loadCustomFont(s3FilePath, convertFontFamily(fontFamily, fontId));
+  textNode.fontFamily(convertFontFamily(fontFamily, fontId))
 
   const cornerRadiusMax = Math.max(
     cornerRadiusTopLeft,
@@ -94,13 +132,6 @@ export const processText = async (textData: Text, groupData?: Group) => {
     opacity: opacity,
     width: width,
     height: height,
-    ...(isEnableBackground && {
-      shadowColor,
-      shadowBlur,
-      shadowOffsetX,
-      shadowOffsetY,
-      shadowOpacity,
-    }),
     cornerRadius: [
       cornerRadiusTopLeft,
       cornerRadiusTopRight,
