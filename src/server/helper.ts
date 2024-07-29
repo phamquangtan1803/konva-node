@@ -1,6 +1,4 @@
-import { loadImage } from "canvas";
 import axios from "axios";
-import Konva from "konva";
 import { Logo } from "./types/logo.js";
 
 export const TEXT_ALIGNMENTS = {
@@ -13,78 +11,6 @@ export const TEXT_ALIGNMENTS = {
   MIDDLE: "middle",
 };
 
-export async function loadFillPatternImageNode(node, url) {
-  const image = await loadImage(url);
-
-  const cropX = node.getAttr("cropX") || 0;
-  const cropY = node.getAttr("cropY") || 0;
-  const cropWidth = node.getAttr("cropWidth") || image.width;
-  const cropHeight = node.getAttr("cropHeight") || image.height;
-  const width = node.getAttr("width") || image.width;
-  const height = node.getAttr("height") || image.height;
-  const scaleX = node.getAttr("scaleX") || image.height;
-  const scaleY = node.getAttr("scaleY") || image.height;
-
-  // node.setAttr("cropHeight", image.height * cropHeight || 0);
-  // node.setAttr("cropWidth", image.width * cropWidth || 0);
-  // node.setAttr("cropY", image.height * cropY || 0);
-  // node.setAttr("cropX", image.width * cropX || 0);
-
-  const scaleImageX = width / image?.width / cropWidth;
-  const scaleImageY = height / image?.height / cropHeight;
-  const offsetImageX = image?.width * cropX;
-  const offsetImageY = image?.height * cropY;
-
-  node.fillPatternScaleX(scaleImageX / scaleX);
-  node.fillPatternScaleY(scaleImageY / scaleY);
-  node.fillPatternOffsetX(offsetImageX);
-  node.fillPatternOffsetY(offsetImageY);
-  node.fillPatternImage(image);
-  node.setAttr("fill", undefined);
-
-  console.log(node.attrs);
-}
-export async function loadLogoNode(node, url) {
-  const image = await loadImage(url);
-
-  node.image(image);
-}
-
-async function drawBackgroundNode(backgroundNode, textNode) {
-  console.log("background node", backgroundNode);
-  console.log("textNode", textNode);
-}
-
-export async function handleLoadData(stage) {
-  const nodes = stage.find("Image, Text, Path, Shape");
-  const loadPromises: Promise<any> = [];
-  nodes.forEach((node, index: number) => {
-    if (!node.attrs.elementType) return;
-
-    if (node.className === "Image") {
-      if (node.attrs.elementType === "logo")
-        loadPromises.push(loadLogoNode(node, node.attrs.src));
-      else {
-        loadPromises.push(loadImageNode(node, node.attrs.src));
-      }
-    }
-
-    if (node.className === "Text" && node.attrs.s3FilePath) {
-      loadPromises.push(loadTextNode(node));
-    }
-
-    if (node.className === "Shape" && node.attrs.elementType) {
-      loadPromises.push(drawBackgroundNode(node, nodes[index + 1]));
-    }
-
-    if (node.className === "Path") {
-      if (node.attrs.src != "")
-        loadPromises.push(loadFillPatternImageNode(node, node.attrs.src));
-    }
-  });
-
-  await Promise.all(loadPromises);
-}
 export async function fetchJsonData(apiUrl: string) {
   try {
     const response = await axios.get(apiUrl);
@@ -158,11 +84,19 @@ export const calculateLogoSize = (logoData: Logo) => {
   };
 };
 export const applyFillColor = (node, fillColor) => {
-  if (node.attributes) {
+  if (node.attributes && node.name === "path") {
     node.attributes.fill = fillColor;
   }
   if (node.children) {
     node.children.forEach((child) => applyFillColor(child, fillColor));
+  }
+};
+export const applyStrokeColor = (node, strokeColor) => {
+  if (node.attributes) {
+    node.attributes.stroke = strokeColor;
+  }
+  if (node.children) {
+    node.children.forEach((child) => applyStrokeColor(child, strokeColor));
   }
 };
 
@@ -495,4 +429,24 @@ export const drawTextBackground = ({ ctx, shape, textElement, options }) => {
 
   shape.hasFill(true);
   ctx.fillStrokeShape(shape);
+};
+export const joinGroupElement = (elementList: any[]) => {
+  let groupList: any = [];
+  let listElementInGroup: string[] = [];
+  elementList.forEach((element) => {
+    if (element.type === "group") {
+      listElementInGroup.push(...element.elementIds);
+
+      const groupChildren = element.elementIds.map((id: string) => {
+        const children = elementList.filter((item) => item.id === id)[0];
+        return children;
+      });
+      groupList.push({ ...element, groupChildren: groupChildren });
+    }
+  });
+  const newElementList = elementList
+    .filter((element) => !listElementInGroup.includes(element.id))
+    .filter((element) => element.type != "group");
+  newElementList.push(...groupList);
+  return newElementList;
 };

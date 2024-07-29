@@ -19,4 +19,5 @@ export interface Group {
   scaleY: number;
   rotation: number;
   pageId: string;
+  groupChildren: any;
 }

@@ -1,8 +1,7 @@
 import Konva from "konva";
-import { Group } from "../types/group.js";
 import { Line } from "../types/line.js";
 
-export const processLineNode = (shapeData: Line, groupData?: Group) => {
+export const processLineNode = (shapeData: Line) => {
   const {
     id,
     x,
@@ -29,6 +28,8 @@ export const processLineNode = (shapeData: Line, groupData?: Group) => {
     id: `group-${id}`,
     x,
     y,
+    rotation,
+    opacity,
   });
 
   const lineNode = new Konva.Line({
@@ -37,7 +38,6 @@ export const processLineNode = (shapeData: Line, groupData?: Group) => {
     stroke,
     strokeWidth,
     opacity,
-    rotation,
     shadowColor,
     shadowBlur,
     shadowOpacity,
@@ -53,8 +53,7 @@ export const processLineNode = (shapeData: Line, groupData?: Group) => {
       points,
       stroke: overlayFill,
       strokeWidth,
-      opacity: alpha * opacity,
-      rotation,
+      opacity: alpha,
       shadowColor,
       shadowBlur,
       shadowOpacity,

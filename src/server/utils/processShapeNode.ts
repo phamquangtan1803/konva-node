@@ -1,11 +1,10 @@
 import Konva from "konva";
 import { loadImage } from "canvas";
-import { Group } from "../types/group.js";
 import { parse, stringify } from "svgson";
 import { Shape } from "../types/shape.js";
 import { applyFillColor } from "../helper.js";
 
-export const processShapeNode = async (shapeData: Shape, groupData?: Group) => {
+export const processShapeNode = async (shapeData: Shape) => {
   const {
     id,
     x,
@@ -57,11 +56,12 @@ export const processShapeNode = async (shapeData: Shape, groupData?: Group) => {
   // Get path data
   const path = findPathDAttribute(modifiedSvgObject);
 
-  console.log("path", path);
   const groupNode = new Konva.Group({
     id: `group-${id}`,
     x,
     y,
+    rotation,
+    opacity,
   });
   const shapeNode = new Konva.Path({
     id,
@@ -71,8 +71,6 @@ export const processShapeNode = async (shapeData: Shape, groupData?: Group) => {
     scaleY,
     x: 0, // Set relative to the group
     y: 0, // Set relative to the group
-    opacity,
-    rotation,
     shadowColor,
     shadowBlur: shadowBlur / Math.max(scaleX, scaleY),
     shadowOpacity: shadowOpacity * opacity,
@@ -108,8 +106,7 @@ export const processShapeNode = async (shapeData: Shape, groupData?: Group) => {
       scaleY,
       x: 0, // Set relative to the group
       y: 0, // Set relative to the group
-      opacity: alpha * opacity,
-      rotation,
+      opacity: alpha,
       fill: overlayFill,
       stroke,
       strokeWidth: shapeStrokeWidth,
@@ -122,7 +119,6 @@ export const processShapeNode = async (shapeData: Shape, groupData?: Group) => {
 const findPathDAttribute = (svgObject: any) => {
   let pathDAttribute: string[] = [];
   svgObject.children.forEach((child) => {
-    console.log(child);
     if (child.name === "path" && child.attributes && child.attributes.d) {
       pathDAttribute += child.attributes.d;
     }

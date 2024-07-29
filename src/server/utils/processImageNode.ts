@@ -1,8 +1,13 @@
 import Konva from "konva";
-import { Group } from "../types/group.js";
 import { loadImage } from "canvas";
-
-export const processImageNode = async (imageData: any, groupData?: Group) => {
+import { applyStrokeColor } from "../helper.js";
+import { parse, stringify } from "svgson";
+import { Image } from "../types/image.js";
+import { exec } from "child_process";
+import fs from "fs";
+import path from "path";
+import { __dirname } from "../pathUtil.mjs";
+export const processImageNode = async (imageData: Image) => {
   const {
     id,
     imageWidth,
@@ -32,6 +37,7 @@ export const processImageNode = async (imageData: any, groupData?: Group) => {
     overlayFill,
     elementType,
     alpha,
+    svgColor,
   } = imageData;
 
   const overlayNode = new Konva.Rect({
@@ -40,8 +46,7 @@ export const processImageNode = async (imageData: any, groupData?: Group) => {
     height,
     x: 0, // Set relative to the group
     y: 0, // Set relative to the group
-    opacity: opacity * alpha,
-    rotation,
+    opacity: alpha,
     fill: overlayFill,
     cornerRadius: [
       cornerRadiusTopLeft,
@@ -57,8 +62,6 @@ export const processImageNode = async (imageData: any, groupData?: Group) => {
     height,
     x: 0, // Set relative to the group
     y: 0, // Set relative to the group
-    opacity,
-    rotation,
     shadowColor,
     shadowBlur,
     shadowOpacity,
@@ -79,8 +82,60 @@ export const processImageNode = async (imageData: any, groupData?: Group) => {
       cornerRadiusBottomLeft,
     ],
   });
+  let getImageSrc;
+  if (src.endsWith(".svg")) {
+    const response = await fetch(src);
+    const svgText = await response.text();
 
-  const image = await loadImage(src);
+    // Parse the SVG
+    const svgObject = await parse(svgText);
+    // Modify the fill color
+
+    applyStrokeColor(svgObject, svgColor || "#000");
+
+    svgObject.attributes.width = width.toString();
+    svgObject.attributes.height = height.toString();
+
+    // Convert back to SVG string
+    const modifiedSvgText = stringify(svgObject);
+
+    // Create a data URL from the modified SVG string
+    getImageSrc = `data:image/svg+xml;base64,${Buffer.from(
+      modifiedSvgText
+    ).toString("base64")}`;
+    imageNode.node;
+  } else if (
+    src.endsWith(".mp4") ||
+    src.endsWith(".webm") ||
+    src.endsWith(".ogg")
+  ) {
+    const videoPosterDir = path.join(__dirname, "videoPoster");
+    if (!fs.existsSync(videoPosterDir)) {
+      fs.mkdirSync(videoPosterDir, { recursive: true });
+    }
+    // Create a temporary file path for the extracted frame
+    const tempFilePath = path.join(videoPosterDir, `frame-${id}.png`);
+    if (fs.existsSync(tempFilePath)) {
+      fs.unlinkSync(tempFilePath);
+    }
+
+    await new Promise((resolve, reject) => {
+      exec(
+        `ffmpeg -i "${src}" -vf "scale=${width}:${height}" -vframes 1 "${tempFilePath}"`,
+        (error) => {
+          if (error) {
+            return reject(error);
+          }
+          resolve(null);
+        }
+      );
+    });
+
+    getImageSrc = tempFilePath;
+  } else {
+    getImageSrc = src;
+  }
+  const image = await loadImage(getImageSrc);
 
   imageNode.setAttr("cropHeight", image.height * cropHeight || 0);
   imageNode.setAttr("cropWidth", image.width * cropWidth || 0);
@@ -93,6 +148,8 @@ export const processImageNode = async (imageData: any, groupData?: Group) => {
     id: `group-${id}`,
     x,
     y,
+    opacity,
+    rotation,
   });
 
   groupNode.add(imageNode);

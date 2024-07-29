@@ -1,17 +1,10 @@
 import Konva from "konva";
-import { loadImage } from "canvas";
-import { Group } from "../types/group.js";
-import { parse, stringify } from "svgson";
 import { Shape } from "../types/shape.js";
-import { applyFillColor } from "../helper.js";
 const NUM_STARS = 5;
 const STARS_ARR = [...Array(NUM_STARS).keys()];
 const STAR_PATH =
   "M52 0.545044L64.2755 38.3253H104L71.8622 61.6747L84.1378 99.4549L52 76.1055L19.8622 99.4549L32.1378 61.6747L0 38.3253H39.7245L52 0.545044Z";
-export const processStarRatingNode = async (
-  starRatingData: Shape,
-  groupData?: Group
-) => {
+export const processStarRatingNode = async (starRatingData: Shape) => {
   const {
     id,
     x,
@@ -61,7 +54,6 @@ export const processStarRatingNode = async (
     stroke,
     data: STAR_PATH,
   };
-  console.log("STARARR", STARS_ARR);
   STARS_ARR.forEach((star, index) => {
     const starNode = new Konva.Path({
       ...starAttr,

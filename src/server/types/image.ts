@@ -62,6 +62,7 @@ export interface Image {
   fillPatternScaleX: number;
   fillPatternScaleY: number;
   svgElement: any; // You might want to type this according to your specific SVG element type
+  svgColor: string;
   imageWidth: number;
   imageHeight: number;
   mute: boolean;

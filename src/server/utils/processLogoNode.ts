@@ -1,14 +1,10 @@
 import { loadImage } from "canvas";
-import { Group } from "../types/group.js";
 import { Logo } from "../types/logo.js";
 import { parse, stringify } from "svgson";
 import Konva from "konva";
 import { applyFillColor, calculateLogoSize } from "../helper.js";
 
-export const processLogoNode = async (
-  logoData: Logo,
-  groupData?: Group
-): Promise<Konva.Image> => {
+export const processLogoNode = async (logoData: Logo): Promise<Konva.Image> => {
   const {
     id,
     imageWidth,
@@ -26,6 +22,8 @@ export const processLogoNode = async (
     scaleY,
     rotation,
     paddingRatio,
+    width,
+    height,
   } = logoData;
   const {
     paddingX,
@@ -33,6 +31,7 @@ export const processLogoNode = async (
     width: logoWidth,
     height: logoHeight,
   } = calculateLogoSize(logoData);
+  console.log({ logoWidth, logoHeight });
   // Fetch the SVG data
   const response = await fetch(logoData.src);
   const svgText = await response.text();
@@ -42,11 +41,13 @@ export const processLogoNode = async (
 
   // Modify the fill color
 
+  console.log(svgObject);
   applyFillColor(svgObject, logoData.fill);
-
+  // svgObject.attributes.width = logoWidth.toString();
+  // svgObject.attributes.height = logoHeight.toString();
   // Convert back to SVG string
   const modifiedSvgText = stringify(svgObject);
-
+  console.log(modifiedSvgText);
   // Create a data URL from the modified SVG string
   const modifiedSvgDataUrl = `data:image/svg+xml;base64,${Buffer.from(
     modifiedSvgText
@@ -74,7 +75,7 @@ export const processLogoNode = async (
     offsetY: -paddingY,
   });
   // Load the modified SVG image
-  const image = await loadImage(modifiedSvgDataUrl);
+  const image = await loadImage(modifiedSvgDataUrl).then();
   logoNode.image(image);
   // Create and return a Konva.Image node
   return logoNode;

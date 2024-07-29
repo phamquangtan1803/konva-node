@@ -1,22 +1,20 @@
 import express from "express";
-import { createCanvas, loadImage, registerFont } from "canvas";
-import Konva from "konva";
+import { createCanvas } from "canvas";
 import { fetchJsonData } from "./helper.js";
-import data from "./data/data.json";
-import data2 from "./data/data2.json";
 import { createStage } from "./utils/processTemplate.js";
 const URL_ENDPOINTS = "https://stg-api.obello.com";
-const TEMPLATE_SIZE_ID = "36914d880a454e1ca585551a6937003b";
+// const TEMPLATE_SIZE_ID = "f63b0ecda7104e00a167530dd1eff5c5";
 
 const app = express();
 
 app.get("/canvas-image", async (req, res) => {
+  const templateSizeId = req.query.template_size_id;
+
   const api_url =
     URL_ENDPOINTS +
-    `/template-service/animations/list?template_size_id=${TEMPLATE_SIZE_ID}`;
+    `/template-service/animations/list?template_size_id=${templateSizeId}`;
 
   const templateObelloData = await fetchJsonData(api_url);
-  const templateData = data2;
 
   const width = templateObelloData.data[0].width;
   const height = templateObelloData.data[0].height;

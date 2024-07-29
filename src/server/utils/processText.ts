@@ -1,9 +1,8 @@
 import Konva from "konva";
-import { Group } from "../types/group.js";
 import { Text } from "../types/text.js";
 import { drawTextBackground } from "../helper.js";
-
-export const processText = async (textData: Text, groupData?: Group) => {
+import { registerFont } from "canvas";
+export const processText = async (textData: Text) => {
   const {
     id,
     width,
@@ -36,6 +35,7 @@ export const processText = async (textData: Text, groupData?: Group) => {
     scaleY,
     visible,
     textTransform,
+    fontFamily,
   } = textData;
 
   const isEnableBackground = fill && fill !== "" && fill !== "transparent";
@@ -74,6 +74,7 @@ export const processText = async (textData: Text, groupData?: Group) => {
     scaleX,
     scaleY,
     visible,
+    fontFamily,
   });
 
   const cornerRadiusMax = Math.max(
@@ -94,13 +95,13 @@ export const processText = async (textData: Text, groupData?: Group) => {
     opacity: opacity,
     width: width,
     height: height,
-    ...(isEnableBackground && {
-      shadowColor,
-      shadowBlur,
-      shadowOffsetX,
-      shadowOffsetY,
-      shadowOpacity,
-    }),
+    // ...(isEnableBackground && {
+    //   shadowColor,
+    //   shadowBlur,
+    //   shadowOffsetX,
+    //   shadowOffsetY,
+    //   shadowOpacity,
+    // }),
     cornerRadius: [
       cornerRadiusTopLeft,
       cornerRadiusTopRight,

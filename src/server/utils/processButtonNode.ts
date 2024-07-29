@@ -1,15 +1,8 @@
 import Konva from "konva";
 import { loadImage } from "canvas";
-import { Group } from "../types/group.js";
-import { parse, stringify } from "svgson";
-import { Shape } from "../types/shape.js";
-import { applyFillColor } from "../helper.js";
 import { Button } from "../types/button.js";
 
-export const processButtonNode = async (
-  buttonData: Button,
-  groupData?: Group
-) => {
+export const processButtonNode = async (buttonData: Button) => {
   const {
     scaleX,
     scaleY,
@@ -54,6 +47,7 @@ export const processButtonNode = async (
     x,
     y,
     rotation,
+    opacity,
   });
   const buttonRectNode = new Konva.Image({
     id,
@@ -61,8 +55,6 @@ export const processButtonNode = async (
     height,
     x: 0, // Set relative to the group
     y: 0, // Set relative to the group
-    opacity,
-    rotation,
     shadowColor,
     shadowBlur,
     shadowOpacity,
@@ -107,8 +99,7 @@ export const processButtonNode = async (
       height,
       x: 0, // Set relative to the group
       y: 0, // Set relative to the group
-      opacity: alpha * opacity,
-      rotation,
+      opacity: alpha,
 
       fill: overlayFill,
       strokeWidth,
@@ -133,8 +124,6 @@ export const processButtonNode = async (
     height,
     x: 0, // Set relative to the group
     y: 0, // Set relative to the group
-    opacity: opacity,
-    rotation,
     text,
     fontFamily,
     fontSize,

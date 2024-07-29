@@ -20,6 +20,8 @@ export interface Button {
   cropHeight: number;
   cropX: number;
   cropY: number;
+  overlayFill: string;
+  alpha: number;
   fontSize: number;
   visible: boolean;
   padding: {
