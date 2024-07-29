@@ -1,8 +1,7 @@
 import Konva from "konva";
 import { loadImage } from "canvas";
-import { Button } from "../types/button.js";
 
-export const processButtonNode = async (buttonData: Button) => {
+export const processButtonNode = async (buttonData) => {
   const {
     scaleX,
     scaleY,

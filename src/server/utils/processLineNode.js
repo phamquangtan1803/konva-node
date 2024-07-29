@@ -1,7 +1,6 @@
 import Konva from "konva";
-import { Line } from "../types/line.js";
 
-export const processLineNode = (shapeData: Line) => {
+export const processLineNode = (shapeData) => {
   const {
     id,
     x,

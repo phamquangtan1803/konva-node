@@ -1,10 +1,7 @@
 import Konva from "konva";
 import { loadImage } from "canvas";
-import { parse, stringify } from "svgson";
-import { Shape } from "../types/shape.js";
-import { applyFillColor } from "../helper.js";
 
-export const processShapeNode = async (shapeData: Shape) => {
+export const processRectNode = async (shapeData) => {
   const {
     id,
     x,
@@ -29,32 +26,55 @@ export const processShapeNode = async (shapeData: Shape) => {
     cropWidth,
     cropHeight,
     src,
+    name,
+    cornerRadiusTopLeft,
+    cornerRadiusBottomLeft,
+    cornerRadiusBottomRight,
+    cornerRadiusTopRight,
   } = shapeData;
 
   const scaleX = width / svgElement.width;
   const scaleY = height / svgElement.height;
   const shapeStrokeWidth = (strokeWidth * 10) / Math.max(scaleX, scaleY);
+  const cornerScale = Math.max(
+    width / svgElement.width,
+    height / svgElement.height
+  );
 
-  // Fetch the SVG data
-  const response = await fetch(svgElement.svgUrl);
-  const svgText = await response.text();
+  const cornerProps = [
+    name === "Square"
+      ? cornerRadiusTopLeft / cornerScale
+      : Math.max(svgElement.width, svgElement.height) / 2,
+    name === "Square"
+      ? cornerRadiusTopRight / cornerScale
+      : Math.max(svgElement.width, svgElement.height) / 2,
+    name === "Square"
+      ? cornerRadiusBottomRight / cornerScale
+      : Math.max(svgElement.width, svgElement.height) / 2,
+    name === "Square"
+      ? cornerRadiusBottomLeft / cornerScale
+      : Math.max(svgElement.width, svgElement.height) / 2,
+  ];
+  //   // Fetch the SVG data
+  //   const response = await fetch(svgElement.svgUrl);
+  //   const svgText = await response.text();
 
-  // Parse the SVG
+  //   // Parse the SVG
 
-  const svgObject = await parse(svgText);
-  // Modify the fill color
-  if (svgObject.attributes) {
-    svgObject.attributes.fill = shapeData.fill;
-  }
-  if (svgObject.children) {
-    svgObject.children.forEach((child) =>
-      applyFillColor(child, shapeData.fill)
-    );
-  }
-  const modifiedSvgText = stringify(svgObject);
-  const modifiedSvgObject = await parse(modifiedSvgText);
-  // Get path data
-  const path = findPathDAttribute(modifiedSvgObject);
+  //   const svgObject = await parse(svgText);
+  //   // Modify the fill color
+  //   if (svgObject.attributes) {
+  //     svgObject.attributes.fill = shapeData.fill;
+  //   }
+  //   if (svgObject.children) {
+  //     svgObject.children.forEach((child) =>
+  //       applyFillColor(child, shapeData.fill)
+  //     );
+  //   }
+  //   const modifiedSvgText = stringify(svgObject);
+  //   const modifiedSvgObject = await parse(modifiedSvgText);
+  //   // Get path data
+  //   const path = findPathDAttribute(modifiedSvgObject);
 
   const groupNode = new Konva.Group({
     id: `group-${id}`,
@@ -63,10 +83,11 @@ export const processShapeNode = async (shapeData: Shape) => {
     rotation,
     opacity,
   });
-  const shapeNode = new Konva.Path({
+
+  const shapeNode = new Konva.Rect({
     id,
-    width,
-    height,
+    width: svgElement.width,
+    height: svgElement.height,
     scaleX,
     scaleY,
     x: 0, // Set relative to the group
@@ -79,7 +100,7 @@ export const processShapeNode = async (shapeData: Shape) => {
     fill,
     stroke,
     strokeWidth: shapeStrokeWidth,
-    data: path,
+    cornerRadius: cornerProps,
   });
 
   if (src) {
@@ -89,43 +110,35 @@ export const processShapeNode = async (shapeData: Shape) => {
       const scaleImageY = height / image?.height / cropHeight;
       const offsetImageX = image?.width * cropX;
       const offsetImageY = image?.height * cropY;
+
       shapeNode.fillPatternScaleX(scaleImageX / scaleX);
       shapeNode.fillPatternScaleY(scaleImageY / scaleY);
       shapeNode.fillPatternOffsetX(offsetImageX);
       shapeNode.fillPatternOffsetY(offsetImageY);
       shapeNode.fillPatternImage(image);
       shapeNode.setAttr("fill", undefined);
-    } catch (error: any) {
+    } catch (error) {
       console.error(`Failed to load image: ${error.message}`);
     }
   }
 
   groupNode.add(shapeNode);
   if (overlayFill) {
-    const overlayNode = new Konva.Path({
+    const overlayNode = new Konva.Rect({
       id: `overlay-${id}`,
-      width,
-      height,
+      width: svgElement.width,
+      height: svgElement.height,
       scaleX,
       scaleY,
       x: 0, // Set relative to the group
       y: 0, // Set relative to the group
       opacity: alpha,
       fill: overlayFill,
-      stroke,
+      stroke: overlayFill,
       strokeWidth: shapeStrokeWidth,
-      data: path,
+      cornerRadius: cornerProps,
     });
     groupNode.add(overlayNode);
   }
   return groupNode;
-};
-const findPathDAttribute = (svgObject: any) => {
-  let pathDAttribute: string[] = [];
-  svgObject.children.forEach((child) => {
-    if (child.name === "path" && child.attributes && child.attributes.d) {
-      pathDAttribute += child.attributes.d;
-    }
-  });
-  return pathDAttribute;
 };

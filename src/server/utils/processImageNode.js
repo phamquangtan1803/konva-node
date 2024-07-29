@@ -2,12 +2,11 @@ import Konva from "konva";
 import { loadImage } from "canvas";
 import { applyStrokeColor } from "../helper.js";
 import { parse, stringify } from "svgson";
-import { Image } from "../types/image.js";
 import { exec } from "child_process";
 import fs from "fs";
 import path from "path";
 import { __dirname } from "../pathUtil.js";
-export const processImageNode = async (imageData: Image) => {
+export const processImageNode = async (imageData) => {
   const {
     id,
     imageWidth,
@@ -144,7 +143,7 @@ export const processImageNode = async (imageData: Image) => {
     imageNode.setAttr("cropX", image.width * cropX || 0);
 
     imageNode.image(image);
-  } catch (error: any) {
+  } catch (error) {
     console.error(`Failed to load image: ${error.message}`);
   }
 

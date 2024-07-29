@@ -1,5 +1,4 @@
 import axios from "axios";
-import { Logo } from "./types/logo.js";
 // import WebFont from "webfontloader";
 
 export const TEXT_ALIGNMENTS = {
@@ -12,14 +11,14 @@ export const TEXT_ALIGNMENTS = {
   MIDDLE: "middle",
 };
 
-export const TEXT_TRANSFORM: any = {
+export const TEXT_TRANSFORM = {
   SENTENCE_CASE: "sentenceCase",
   UPPERCASE: "uppercase",
   TITLE_CASE: "titleCase",
   AS_TYPED: "none",
 };
 
-export async function fetchJsonData(apiUrl: string) {
+export async function fetchJsonData(apiUrl) {
   try {
     const response = await axios.get(apiUrl);
     return response.data;
@@ -29,15 +28,13 @@ export async function fetchJsonData(apiUrl: string) {
   }
 }
 
-export const calculateLogoSize = (logoData: Logo) => {
+export const calculateLogoSize = (logoData) => {
   const {
     padding: { paddingRight, paddingLeft, paddingBottom, paddingTop },
   } = logoData;
   let logoPadding;
 
-  const ratio: number = Math.round(
-    (logoData.imageWidth / logoData.imageHeight) * 100
-  );
+  const ratio = Math.round((logoData.imageWidth / logoData.imageHeight) * 100);
   if (ratio < 62.5) {
     logoPadding = logoData.imageWidth;
   } else if (62.5 <= ratio && ratio <= 100) {
@@ -49,18 +46,18 @@ export const calculateLogoSize = (logoData: Logo) => {
   }
   logoPadding = logoPadding * logoData.paddingRatio;
 
-  const imageBoxPaddingHorizontal: number =
+  const imageBoxPaddingHorizontal =
     (paddingRight ? logoPadding : 0) + (paddingLeft ? logoPadding : 0);
-  const imageBoxPaddingVertical: number =
+  const imageBoxPaddingVertical =
     (paddingTop ? logoPadding : 0) + (paddingBottom ? logoPadding : 0);
 
-  const imageBoxWidth: number = logoData.imageWidth + imageBoxPaddingHorizontal;
-  const imageBoxHeight: number = logoData.imageHeight + imageBoxPaddingVertical;
+  const imageBoxWidth = logoData.imageWidth + imageBoxPaddingHorizontal;
+  const imageBoxHeight = logoData.imageHeight + imageBoxPaddingVertical;
 
   const scaleY = logoData.height / imageBoxHeight;
   const scaleX = logoData.width / imageBoxWidth;
   const scaleImageBox = scaleX > scaleY ? scaleY : scaleX;
-  const containerPadding: number = logoPadding * scaleImageBox;
+  const containerPadding = logoPadding * scaleImageBox;
 
   const containerPaddingTop = paddingTop ? containerPadding : 0;
   const containerPaddingRight = paddingRight ? containerPadding : 0;
@@ -73,12 +70,12 @@ export const calculateLogoSize = (logoData: Logo) => {
   const imageHeight =
     scaleHeight - containerPaddingTop - containerPaddingBottom;
 
-  const imagePaddingLeft: number = paddingLeft
+  const imagePaddingLeft = paddingLeft
     ? paddingRight
       ? (logoData.width - imageWidth) / 2
       : logoData.width - imageWidth
     : 0;
-  const imagePaddingTop: number = paddingTop
+  const imagePaddingTop = paddingTop
     ? paddingBottom
       ? (logoData.height - imageHeight) / 2
       : logoData.height - imageHeight
@@ -265,7 +262,7 @@ export const drawTextBackground = ({ ctx, shape, textElement, options }) => {
     ? Math.min(cornerRadius, shapeHeight / 2, shapeWidth / 2)
     : Math.min(cornerRadius, lineHeight / 2);
 
-  lines = lines.map((line: any, index: number) => {
+  lines = lines.map((line, index) => {
     let lineWidth;
     const prevLine = lines[index - 1];
     const nextLine = lines[index + 1];
@@ -438,14 +435,14 @@ export const drawTextBackground = ({ ctx, shape, textElement, options }) => {
   shape.hasFill(true);
   ctx.fillStrokeShape(shape);
 };
-export const joinGroupElement = (elementList: any[]) => {
-  let groupList: any = [];
-  let listElementInGroup: string[] = [];
+export const joinGroupElement = (elementList) => {
+  let groupList = [];
+  let listElementInGroup = [];
   elementList.forEach((element) => {
     if (element.type === "group") {
       listElementInGroup.push(...element.elementIds);
 
-      const groupChildren = element.elementIds.map((id: string) => {
+      const groupChildren = element.elementIds.map((id) => {
         const children = elementList.filter((item) => item.id === id)[0];
         return children;
       });

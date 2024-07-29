@@ -1,4 +1,3 @@
-import { Group } from "../types/group.js";
 import Konva from "konva";
 import { processLogoNode } from "./processLogoNode.js";
 import { processText } from "./processText.js";
@@ -8,7 +7,7 @@ import { processButtonNode } from "./processButtonNode.js";
 import { processStarRatingNode } from "./processStarRating.js";
 import { processShapeNode } from "./processShapeNode.js";
 
-export const processGroupNode = async (groupData: Group) => {
+export const processGroupNode = async (groupData) => {
   const {
     id,
     visible,
@@ -45,7 +44,7 @@ export const processGroupNode = async (groupData: Group) => {
   }
   return groupNode;
 };
-const processElement = async (element: any) => {
+const processElement = async (element) => {
   if (!element.visible) return;
 
   switch (element.type) {

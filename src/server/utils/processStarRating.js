@@ -1,10 +1,9 @@
 import Konva from "konva";
-import { Shape } from "../types/shape.js";
 const NUM_STARS = 5;
 const STARS_ARR = [...Array(NUM_STARS).keys()];
 const STAR_PATH =
   "M52 0.545044L64.2755 38.3253H104L71.8622 61.6747L84.1378 99.4549L52 76.1055L19.8622 99.4549L32.1378 61.6747L0 38.3253H39.7245L52 0.545044Z";
-export const processStarRatingNode = async (starRatingData: Shape) => {
+export const processStarRatingNode = async (starRatingData) => {
   const {
     id,
     x,

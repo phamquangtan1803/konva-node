@@ -10,7 +10,7 @@ import { processGroupNode } from "./processGroupNode.js";
 import { joinGroupElement } from "../helper.js";
 import { processRectNode } from "./processRectNode.js";
 
-export const createStage = async (data: any) => {
+export const createStage = async (data) => {
   const backgroundNode = new Konva.Rect({
     x: 0,
     y: 0,
@@ -43,7 +43,7 @@ export const createStage = async (data: any) => {
   return stage;
 };
 
-const processElement = async (element: any) => {
+const processElement = async (element) => {
   if (!element.visible) return;
 
   switch (element.type) {

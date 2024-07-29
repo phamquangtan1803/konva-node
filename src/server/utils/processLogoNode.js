@@ -1,10 +1,9 @@
 import { loadImage } from "canvas";
-import { Logo } from "../types/logo.js";
 import { parse, stringify } from "svgson";
 import Konva from "konva";
 import { applyFillColor, calculateLogoSize } from "../helper.js";
 
-export const processLogoNode = async (logoData: Logo): Promise<Konva.Image> => {
+export const processLogoNode = async (logoData) => {
   const {
     id,
     imageWidth,

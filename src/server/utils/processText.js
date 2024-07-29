@@ -1,6 +1,5 @@
 import Konva from "konva";
 import axios from "axios";
-import { Text } from "../types/text.js";
 import {
   drawTextBackground,
   convertTextToStyle,
@@ -14,7 +13,7 @@ import { __dirname } from "../pathUtil.js";
 // Get the directory name of the current module
 const fontsDir = path.join(__dirname, "fonts");
 
-export const processText = async (textData: Text) => {
+export const processText = async (textData) => {
   const {
     id,
     width,
@@ -52,6 +51,10 @@ export const processText = async (textData: Text) => {
     textDecoration,
     fontId,
   } = textData;
+  const uniqueFileName = `custom-font-${id}.otf`;
+  const fontPath = path.join(fontsDir, uniqueFileName);
+
+  // registerFont(fontPath, { family: fontFamily });
 
   const fontFamilyConvert = convertFontFamily(fontFamily, fontId);
   const groupNode = new Konva.Group({
@@ -94,7 +97,6 @@ export const processText = async (textData: Text) => {
     fontFamily,
   });
 
-  await loadCustomFont(s3FilePath, fontFamilyConvert);
   textNode.fontFamily(fontFamilyConvert);
   const cornerRadiusMax = Math.max(
     cornerRadiusTopLeft,
@@ -122,7 +124,7 @@ export const processText = async (textData: Text) => {
     ],
   });
 
-  backgroundNode.sceneFunc(function (ctx: any, shape: any) {
+  backgroundNode.sceneFunc(function (ctx, shape) {
     drawTextBackground({
       ctx,
       shape,
@@ -139,25 +141,4 @@ export const processText = async (textData: Text) => {
   groupNode.add(textNode);
 
   return groupNode;
-};
-const loadCustomFont = async (s3FilePath: string, fontFamily: string) => {
-  const uniqueFileName = `custom-font-${Date.now()}.otf`;
-  const fontPath = path.join(fontsDir, uniqueFileName);
-
-  try {
-    if (!s3FilePath) {
-      throw new Error("There is no file path");
-    }
-    const response = await axios.get(s3FilePath, {
-      responseType: "arraybuffer",
-    });
-    const buffer = Buffer.from(response.data);
-    fs.writeFileSync(fontPath, buffer);
-
-    registerFont(fontPath, { family: fontFamily });
-    await new Promise((resolve) => setTimeout(resolve, 100));
-  } catch (error) {
-    console.error("Error loading font:", error);
-    throw error;
-  }
 };
