@@ -8,6 +8,7 @@ import { processButtonNode } from "./processButtonNode.js";
 import { processStarRatingNode } from "./processStarRating.js";
 import { processGroupNode } from "./processGroupNode.js";
 import { joinGroupElement } from "../helper.js";
+import { processRectNode } from "./processRectNode.js";
 
 export const createStage = async (data: any) => {
   const backgroundNode = new Konva.Rect({
@@ -65,7 +66,8 @@ const processElement = async (element: any) => {
       if (element.elementType === "button") return processButtonNode(element);
       if (element.elementType === "star_rating")
         return processStarRatingNode(element);
-
+      if (element.name === "Square" || element.name === "Circle")
+        return processRectNode(element);
       return processShapeNode(element);
 
     case "image":

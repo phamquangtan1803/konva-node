@@ -1,6 +1,5 @@
 import Konva from "konva";
 import axios from "axios";
-import { Group } from "../types/group.js";
 import { Text } from "../types/text.js";
 import {
   drawTextBackground,
@@ -54,27 +53,7 @@ export const processText = async (textData: Text) => {
     fontId,
   } = textData;
 
-  const loadCustomFont = async (s3FilePath: string, fontFamily: string) => {
-    const uniqueFileName = `custom-font-${Date.now()}.otf`;
-    const fontPath = path.join(fontsDir, uniqueFileName);
-
-    try {
-      if (!s3FilePath) {
-        throw new Error("There is no file path");
-      }
-      const response = await axios.get(s3FilePath, {
-        responseType: "arraybuffer",
-      });
-      const buffer = Buffer.from(response.data);
-      fs.writeFileSync(fontPath, buffer);
-
-      registerFont(fontPath, { family: fontFamily });
-    } catch (error) {
-      console.error("Error loading font:", error);
-      throw error;
-    }
-  };
-
+  const fontFamilyConvert = convertFontFamily(fontFamily, fontId);
   const groupNode = new Konva.Group({
     id: `group-${id}`,
     x,
@@ -114,17 +93,9 @@ export const processText = async (textData: Text) => {
     visible,
     fontFamily,
   });
-  if (fs.existsSync(fontsDir)) {
-    fs.readdirSync(fontsDir).forEach((file) => {
-      const filePath = path.join(fontsDir, file);
-      fs.unlinkSync(filePath);
-    });
-  } else {
-    fs.mkdirSync(fontsDir);
-  }
-  await loadCustomFont(s3FilePath, convertFontFamily(fontFamily, fontId));
-  textNode.fontFamily(convertFontFamily(fontFamily, fontId));
 
+  await loadCustomFont(s3FilePath, fontFamilyConvert);
+  textNode.fontFamily(fontFamilyConvert);
   const cornerRadiusMax = Math.max(
     cornerRadiusTopLeft,
     cornerRadiusTopRight,
@@ -168,4 +139,25 @@ export const processText = async (textData: Text) => {
   groupNode.add(textNode);
 
   return groupNode;
+};
+const loadCustomFont = async (s3FilePath: string, fontFamily: string) => {
+  const uniqueFileName = `custom-font-${Date.now()}.otf`;
+  const fontPath = path.join(fontsDir, uniqueFileName);
+
+  try {
+    if (!s3FilePath) {
+      throw new Error("There is no file path");
+    }
+    const response = await axios.get(s3FilePath, {
+      responseType: "arraybuffer",
+    });
+    const buffer = Buffer.from(response.data);
+    fs.writeFileSync(fontPath, buffer);
+
+    registerFont(fontPath, { family: fontFamily });
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  } catch (error) {
+    console.error("Error loading font:", error);
+    throw error;
+  }
 };

@@ -31,7 +31,6 @@ export const processLogoNode = async (logoData: Logo): Promise<Konva.Image> => {
     width: logoWidth,
     height: logoHeight,
   } = calculateLogoSize(logoData);
-  console.log({ logoWidth, logoHeight });
   // Fetch the SVG data
   const response = await fetch(logoData.src);
   const svgText = await response.text();
@@ -41,13 +40,11 @@ export const processLogoNode = async (logoData: Logo): Promise<Konva.Image> => {
 
   // Modify the fill color
 
-  console.log(svgObject);
   applyFillColor(svgObject, logoData.fill);
   // svgObject.attributes.width = logoWidth.toString();
   // svgObject.attributes.height = logoHeight.toString();
   // Convert back to SVG string
   const modifiedSvgText = stringify(svgObject);
-  console.log(modifiedSvgText);
   // Create a data URL from the modified SVG string
   const modifiedSvgDataUrl = `data:image/svg+xml;base64,${Buffer.from(
     modifiedSvgText
