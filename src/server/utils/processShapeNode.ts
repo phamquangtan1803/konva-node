@@ -29,6 +29,10 @@ export const processShapeNode = async (shapeData: Shape) => {
     cropWidth,
     cropHeight,
     src,
+    cornerRadiusTopRight,
+    cornerRadiusBottomLeft,
+    cornerRadiusBottomRight,
+    cornerRadiusTopLeft
   } = shapeData;
 
   const scaleX = width / svgElement.width;

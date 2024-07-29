@@ -34,29 +34,32 @@ export const processRectNode = async (shapeData: Shape) => {
     cornerRadiusBottomLeft,
     cornerRadiusBottomRight,
     cornerRadiusTopRight,
+    scaleX,
+    scaleY
   } = shapeData;
 
-  const scaleX = width / svgElement.width;
-  const scaleY = height / svgElement.height;
-  const shapeStrokeWidth = (strokeWidth * 10) / Math.max(scaleX, scaleY);
+  const newScaleX = width / svgElement.width;
+  const newScaleY = height / svgElement.height;
+  const shapeStrokeWidth = (strokeWidth * 10) / Math.max(newScaleX, newScaleY);
   const cornerScale = Math.max(
-    width / svgElement.width,
-    height / svgElement.height
+    width / (svgElement.width),
+    height / (svgElement.height)
   );
 
+
   const cornerProps = [
-    name === "Square"
-      ? cornerRadiusTopLeft / cornerScale
-      : Math.max(svgElement.width, svgElement.height) / 2,
-    name === "Square"
-      ? cornerRadiusTopRight / cornerScale
-      : Math.max(svgElement.width, svgElement.height) / 2,
-    name === "Square"
-      ? cornerRadiusBottomRight / cornerScale
-      : Math.max(svgElement.width, svgElement.height) / 2,
-    name === "Square"
-      ? cornerRadiusBottomLeft / cornerScale
-      : Math.max(svgElement.width, svgElement.height) / 2,
+    name !== "Circle"
+      ? cornerRadiusTopLeft
+      : (Math.max(svgElement.width, svgElement.height) * cornerScale / 2),
+    name !== "Circle"
+      ? cornerRadiusTopRight
+      : (Math.max(svgElement.width, svgElement.height) * cornerScale / 2) ,
+    name !== "Circle"
+      ? cornerRadiusBottomRight
+      : (Math.max(svgElement.width, svgElement.height) * cornerScale / 2),
+    name !== "Circle"
+      ? cornerRadiusBottomLeft
+      : (Math.max(svgElement.width, svgElement.height) * cornerScale / 2) ,
   ];
   //   // Fetch the SVG data
   //   const response = await fetch(svgElement.svgUrl);
@@ -89,8 +92,8 @@ export const processRectNode = async (shapeData: Shape) => {
 
   const shapeNode = new Konva.Rect({
     id,
-    width: svgElement.width,
-    height: svgElement.height,
+    width: width,
+    height: height,
     scaleX,
     scaleY,
     x: 0, // Set relative to the group
