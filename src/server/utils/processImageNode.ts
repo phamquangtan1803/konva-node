@@ -6,7 +6,7 @@ import { Image } from "../types/image.js";
 import { exec } from "child_process";
 import fs from "fs";
 import path from "path";
-import { __dirname } from "../pathUtil.mjs";
+import { __dirname } from "../pathUtil.js";
 export const processImageNode = async (imageData: Image) => {
   const {
     id,
@@ -135,14 +135,18 @@ export const processImageNode = async (imageData: Image) => {
   } else {
     getImageSrc = src;
   }
-  const image = await loadImage(getImageSrc);
+  try {
+    const image = await loadImage(getImageSrc);
 
-  imageNode.setAttr("cropHeight", image.height * cropHeight || 0);
-  imageNode.setAttr("cropWidth", image.width * cropWidth || 0);
-  imageNode.setAttr("cropY", image.height * cropY || 0);
-  imageNode.setAttr("cropX", image.width * cropX || 0);
+    imageNode.setAttr("cropHeight", image.height * cropHeight || 0);
+    imageNode.setAttr("cropWidth", image.width * cropWidth || 0);
+    imageNode.setAttr("cropY", image.height * cropY || 0);
+    imageNode.setAttr("cropX", image.width * cropX || 0);
 
-  imageNode.image(image);
+    imageNode.image(image);
+  } catch (error: any) {
+    console.error(`Failed to load image: ${error.message}`);
+  }
 
   const groupNode = new Konva.Group({
     id: `group-${id}`,

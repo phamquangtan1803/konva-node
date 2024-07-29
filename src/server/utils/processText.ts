@@ -15,7 +15,7 @@ import { __dirname } from "../pathUtil.js";
 // Get the directory name of the current module
 const fontsDir = path.join(__dirname, "fonts");
 
-export const processText = async (textData: Text, groupData?: Group) => {
+export const processText = async (textData: Text) => {
   const {
     id,
     width,
@@ -58,11 +58,10 @@ export const processText = async (textData: Text, groupData?: Group) => {
     const uniqueFileName = `custom-font-${Date.now()}.otf`;
     const fontPath = path.join(fontsDir, uniqueFileName);
 
-    if (!s3FilePath) {
-      throw new Error("There is no file path");
-    }
-
     try {
+      if (!s3FilePath) {
+        throw new Error("There is no file path");
+      }
       const response = await axios.get(s3FilePath, {
         responseType: "arraybuffer",
       });
@@ -101,7 +100,7 @@ export const processText = async (textData: Text, groupData?: Group) => {
     text: convertTextToStyle(text, textTransform),
     lineHeight,
     letterSpacing,
-    fontStyle: `${fontStyle}`,
+    fontStyle,
     textDecoration,
     fontSize,
     align,
@@ -115,7 +114,14 @@ export const processText = async (textData: Text, groupData?: Group) => {
     visible,
     fontFamily,
   });
-
+  if (fs.existsSync(fontsDir)) {
+    fs.readdirSync(fontsDir).forEach((file) => {
+      const filePath = path.join(fontsDir, file);
+      fs.unlinkSync(filePath);
+    });
+  } else {
+    fs.mkdirSync(fontsDir);
+  }
   await loadCustomFont(s3FilePath, convertFontFamily(fontFamily, fontId));
   textNode.fontFamily(convertFontFamily(fontFamily, fontId));
 
