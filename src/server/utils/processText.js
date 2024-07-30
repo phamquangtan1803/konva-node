@@ -5,13 +5,10 @@ import {
   convertTextToStyle,
   convertFontFamily,
 } from "../helper.js";
-import { registerFont } from "canvas";
-import path from "path";
-import fs from "fs";
+
 import { __dirname } from "../pathUtil.js";
 
 // Get the directory name of the current module
-const fontsDir = path.join(__dirname, "fonts");
 
 export const processText = async (textData) => {
   const {
@@ -51,12 +48,8 @@ export const processText = async (textData) => {
     textDecoration,
     fontId,
   } = textData;
-  const uniqueFileName = `custom-font-${id}.otf`;
-  const fontPath = path.join(fontsDir, uniqueFileName);
-
   // registerFont(fontPath, { family: fontFamily });
 
-  const fontFamilyConvert = convertFontFamily(fontFamily, fontId);
   const groupNode = new Konva.Group({
     id: `group-${id}`,
     x,
@@ -94,10 +87,9 @@ export const processText = async (textData) => {
     scaleX,
     scaleY,
     visible,
-    fontFamily,
+    fontFamily: convertFontFamily(fontFamily, fontId),
   });
 
-  textNode.fontFamily(fontFamilyConvert);
   const cornerRadiusMax = Math.max(
     cornerRadiusTopLeft,
     cornerRadiusTopRight,

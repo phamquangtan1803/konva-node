@@ -7,9 +7,9 @@ import fs from "fs";
 import path from "path";
 import { __dirname } from "./pathUtil.js";
 import { registerFont } from "canvas";
-
+import { loadAllFonts, convertFontFamily } from "./helper.js";
 const URL_ENDPOINTS = "https://stg-api.obello.com";
-const fontsDir = path.join(__dirname, "fonts");
+const fontsFolder = path.join(__dirname, "fonts");
 
 // const TEMPLATE_SIZE_ID = "f63b0ecda7104e00a167530dd1eff5c5";
 
@@ -17,6 +17,8 @@ const app = express();
 
 app.get("/canvas-image", async (req, res) => {
   const templateSizeId = req.query.template_size_id;
+  const timestamp = Date.now();
+  const fontsDir = path.join(__dirname, "fonts", `fonts_${timestamp}`);
 
   const api_url =
     URL_ENDPOINTS +
@@ -26,27 +28,30 @@ app.get("/canvas-image", async (req, res) => {
 
   const width = templateObelloData.data[0].width;
   const height = templateObelloData.data[0].height;
+  // if (fs.existsSync(fontsFolder)) {
+  //   console.log("remove path");
+  //   await fs.promises.rm(fontsFolder, { recursive: true });
+  // }
+  await fs.promises.mkdir(fontsDir, { recursive: true });
   try {
-    if (fs.existsSync(fontsDir)) {
-      await fs.promises.rm(fontsDir, { recursive: true });
-    }
-
-    await fs.promises.mkdir(fontsDir, { recursive: true });
-
     const fontPromises = templateObelloData.data[0].children
       .filter((element) => element.type === "text")
       .map(async (element) => {
-        const uniqueFileName = `custom-font-${element.id}.otf`;
-        const fontPath = path.join(fontsDir, uniqueFileName);
+        const fontName =
+          convertFontFamily(element.fontFamily, element.fontId) + ".otf";
+        console.log(fontName);
+        const fontPath = path.join(fontsDir, fontName);
 
         // Download and overwrite the font file
         const response = await axios.get(element.s3FilePath, {
           responseType: "arraybuffer",
         });
         const buffer = Buffer.from(response.data);
-        fs.writeFileSync(fontPath, buffer);
-
-        registerFont(fontPath, { family: element.fontFamily });
+        await fs.promises.writeFile(fontPath, buffer);
+        registerFont(fontPath, {
+          family: convertFontFamily(element.fontFamily, element.fontId),
+          weight: "light",
+        });
       });
 
     // Wait for all fonts to be downloaded and saved
@@ -54,6 +59,8 @@ app.get("/canvas-image", async (req, res) => {
   } catch (e) {
     console.log(e);
   }
+
+  // await loadAllFonts(templateObelloData.data[0].children);
 
   const canvas = createCanvas(width, height);
   const context = canvas.getContext("2d");
@@ -68,6 +75,7 @@ app.get("/canvas-image", async (req, res) => {
   // Send the generated image as a response
   res.setHeader("Content-Type", "image/png");
   res.send(canvas.toBuffer());
+  // await fs.promises.rm(fontsDir, { recursive: true });
 });
 
 // Start the server

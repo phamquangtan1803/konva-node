@@ -1,5 +1,11 @@
 import axios from "axios";
 // import WebFont from "webfontloader";
+import fs from "fs";
+import path from "path";
+import { __dirname } from "./pathUtil.js";
+import { registerFont } from "canvas";
+
+const fontsDir = path.join(__dirname, "fonts");
 
 export const TEXT_ALIGNMENTS = {
   LEFT: "left",
@@ -483,5 +489,52 @@ export const convertTextToStyle = (paragraph = "", style = "") => {
       return paragraph.toUpperCase();
     default:
       return paragraph;
+  }
+};
+
+export const loadAllFonts = async (data) => {
+  try {
+    // if (fs.existsSync(fontsDir)) {
+    //   console.log("remove folder", fontsDir);
+    //   await fs.promises.rm(fontsDir, { recursive: true });
+    // }
+
+    // await fs.promises.mkdir(fontsDir, { recursive: true });
+
+    const fontPromises = templateObelloData.data[0].children
+      .filter((element) => element.type === "text")
+      .foreach(async (element) => {
+        try {
+          const uniqueFileName = convertFontFamily(
+            element.fontFamily,
+            element.fontId
+          );
+          console.log("uniqueFileName", uniqueFileName);
+          const fontPath = path.join(fontsDir, uniqueFileName);
+
+          // Download the font file
+          const response = await axios.get(element.s3FilePath, {
+            responseType: "arraybuffer",
+          });
+
+          const buffer = Buffer.from(response.data);
+
+          // Write the font file
+          await fs.promises.writeFile(fontPath, buffer);
+
+          // Register the font
+          registerFont(fontPath, { family: element.fontFamily });
+        } catch (error) {
+          console.error(
+            `Failed to process font for element ${element.id}:`,
+            error
+          );
+        }
+      });
+
+    // Wait for all font operations to complete
+    await Promise.all(fontPromises);
+  } catch (e) {
+    return e.message;
   }
 };
